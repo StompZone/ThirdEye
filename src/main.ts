@@ -228,7 +228,7 @@ bot.on("text", (packet) => {
     const sender = packet.source_name;
 
     // Skip messages that originated from Discord (sent by the bot using /say)
-    if (message.includes("[Discord]")) {
+    if (message.match(/\[(?:§[0-9a-lr])*Discord(?:§[0-9a-lr])*\]/)) {
         return;
     }
 
