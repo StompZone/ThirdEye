@@ -37,7 +37,9 @@
     "bundle_win": "npm run build_win && if not exist dist mkdir dist && powershell -Command \"Compress-Archive -Path .build\\*, local.env.example -DestinationPath dist/thirdeye-v$((Get-Content package.json | ConvertFrom-Json).version).zip -Force\"",
     "release:patch": "npm version patch && npm run bundle",
     "release:minor": "npm version minor && npm run bundle",
-    "release:major": "npm version major && npm run bundle"
+    "release:major": "npm version major && npm run bundle",
+    "publish": "npm run bundle && gh release create v$(node -p \"require('./package.json').version\") --title \"ThirdEye v$(node -p \"require('./package.json').version\")\" --generate-notes ./dist/thirdeye-v$(node -p \"require('./package.json').version\").zip",
+    "publish:win": "npm run bundle_win && gh release create v%npm_package_version% --title \"ThirdEye v%npm_package_version%\" --generate-notes ./dist/thirdeye-v%npm_package_version%.zip"
   },
   "dependencies": {
     "dotenv": "^16.4.7"
