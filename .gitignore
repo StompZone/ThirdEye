@@ -4,9 +4,11 @@ config.js
 .build/
 build/
 dist/
+!/bin/
+!/bin/*
+
 *.zip
 *-cache.json
-
 .vs/
 local.env
 .env

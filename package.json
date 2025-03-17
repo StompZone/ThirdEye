@@ -1,7 +1,7 @@
 {
   "name": "thirdeye",
   "version": "1.1.3",
-  "productName": "ThirdEye",
+  "productName": "PhoenixEpsilon",
   "description": "Two way chat between Discord and Minecraft Bedrock",
   "type": "module",
   "private": true,
@@ -26,6 +26,7 @@
     "linux//": " --- BUILD (Linux) --- ",
     "clean": "rm -rf .build/",
     "mkDirs": "mkdir -p .build",
+    "copy:ansicon": "cp bin .build/bin",
     "copy:assets": "cp -R src/Install_NodeJS_Modules.bat src/Run.bat src/whitelist.json package.json LICENSE README.md .build",
     "build": "npm run clean; npm run mkDirs; ./node_modules/typescript/bin/tsc -p tsconfig.json; npm run copy:assets; node modify-package.js",
     "windows//": " --- BUILD (Windows) --- ",
