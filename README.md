@@ -110,3 +110,46 @@
   <br>
   <p>Kvr#7119: Original Logo</p>
 </div>
+
+## Building and Publishing
+
+### Building the Project
+
+For Linux:
+```bash
+npm run build
+npm run bundle
+```
+
+For Windows:
+```bash
+npm run build_win
+npm run bundle_win
+```
+
+### Publishing a Release to GitHub
+
+To publish a new release to GitHub, you need to have the GitHub CLI installed and authenticated.
+
+For Linux:
+```bash
+npm run publish
+```
+
+For Windows:
+```bash
+npm run publish:win
+```
+
+This will:
+1. Build the project
+2. Create a zip file with the build artifacts
+3. Create a GitHub release with the current version number
+4. Upload the zip file to the release
+
+You can also use the following commands to increment the version number and then build:
+```bash
+npm run release:patch  # Increment patch version (1.0.0 -> 1.0.1)
+npm run release:minor  # Increment minor version (1.0.0 -> 1.1.0)
+npm run release:major  # Increment major version (1.0.0 -> 2.0.0)
+```

@@ -1,7 +1,7 @@
 import { EmbedBuilder, MessageCreateOptions, MessagePayload, TextBasedChannel } from "discord.js";
 import config from "../config.js";
 import { autoCorrect } from "../main.js";
-import { correction } from "../main.js";
+// import { correction } from "../main.js";
 import { Client } from "bedrock-protocol";
 let thumbUrl: string;
 export function setupAntiCheatListener(bot: Client, channelId: TextBasedChannel) {
@@ -37,10 +37,10 @@ export function setupAntiCheatListener(bot: Client, channelId: TextBasedChannel)
             rawText.includes("§l§o§6[§4Paradox AntiCheat Command Help§6]§r§o")
         ) {
             antiCheatMsg = rawText;
-            correctedText = autoCorrect(antiCheatMsg, correction);
+            correctedText = autoCorrect(antiCheatMsg);
         } else if (rawText.startsWith("§r§6[§aScythe§6]§r")) {
             antiCheatMsg = rawText;
-            correctedText = autoCorrect(antiCheatMsg, correction);
+            correctedText = autoCorrect(antiCheatMsg);
         }
 
         if (correctedText) {
