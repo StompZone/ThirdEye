@@ -26,7 +26,7 @@
     "linux//": " --- BUILD (Linux) --- ",
     "clean": "rm -rf .build/",
     "mkDirs": "mkdir -p .build",
-    "copy:ansicon": "cp bin .build/bin",
+    "copy:ansicon": "cp -R bin .build/bin",
     "copy:assets": "cp -R src/Install_NodeJS_Modules.bat src/Run.bat src/whitelist.json package.json LICENSE README.md .build",
     "build": "npm run clean; npm run mkDirs; ./node_modules/typescript/bin/tsc -p tsconfig.json; npm run copy:assets; npm run copy:ansicon; node modify-package.js",
     "windows//": " --- BUILD (Windows) --- ",
