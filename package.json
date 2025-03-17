@@ -1,6 +1,6 @@
 {
   "name": "thirdeye",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "productName": "ThirdEye",
   "description": "Two way chat between Discord and Minecraft Bedrock",
   "type": "module",
