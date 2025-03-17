@@ -1,6 +1,6 @@
 {
   "name": "thirdeye",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "productName": "PhoenixEpsilon",
   "description": "Two way chat between Discord and Minecraft Bedrock",
   "type": "module",
