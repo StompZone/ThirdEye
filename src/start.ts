@@ -1,5 +1,5 @@
 import { spawn } from "child_process";
-import { createLogger } from "./logger";
+import { createLogger } from "./logger.js";
 
 function startMain() {
     const logger = createLogger();

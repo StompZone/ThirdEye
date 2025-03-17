@@ -1,5 +1,5 @@
 @echo off
-
+CLS
 ECHO Initializing, please wait...
 
 CALL :banner
