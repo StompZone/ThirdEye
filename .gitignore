@@ -1,3 +1,11 @@
 # Ignore the main node_modules directory
 node_modules/
 build/
+config.js
+.build/
+build/
+*-cache.json
+
+.vs/
+local.env
+.env

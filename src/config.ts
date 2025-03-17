@@ -9,6 +9,7 @@ export default {
     guild: "",
     channel: "",
     antiCheatEnabled: true,
+    antiCheatChannelId: "",
     antiCheatLogsChannel: "",
     cmdPrefix: "!",
     useSystemPlayerJoinMessage: false,
