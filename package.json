@@ -1,6 +1,6 @@
 {
   "name": "thirdeye",
-  "version": "1.0.11",
+  "version": "1.1.0",
   "productName": "ThirdEye",
   "description": "Two way chat between Discord and Minecraft Bedrock",
   "type": "module",
@@ -12,7 +12,7 @@
     "prettier": "3.4.2",
     "typescript": "5.7.2",
     "discord-api-types": "0.37.110",
-    "minecraft-data" : "3.84.1"
+    "minecraft-data": "3.84.1"
   },
   "prettier": {
     "trailingComma": "es5",
