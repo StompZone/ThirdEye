@@ -1,5 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
 
 interface Logger {
     log: (message: string) => void;
@@ -8,11 +10,16 @@ interface Logger {
 }
 
 export function createLogger(): Logger {
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = dirname(__filename);
+
+    // Create logs directory if it doesn't exist
     const logsDir = path.join(__dirname, "logs");
     if (!fs.existsSync(logsDir)) {
         fs.mkdirSync(logsDir, { recursive: true });
     }
 
+    // Create log file streams
     const date = new Date().toISOString().replace(/:/g, "-");
     const outLogPath = path.join(logsDir, `output-${date}.log`);
     const errLogPath = path.join(logsDir, `error-${date}.log`);
