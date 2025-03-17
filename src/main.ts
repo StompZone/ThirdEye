@@ -227,6 +227,11 @@ bot.on("text", (packet) => {
     let message = packet.message;
     const sender = packet.source_name;
 
+    // Skip messages that originated from Discord (sent by the bot using /say)
+    if (message.includes("[Discord]")) {
+        return;
+    }
+
     // Remove username patterns like "[Username]" or "Username:" from the start of the message
     message = message.replace(new RegExp(`^\\[${sender}\\]\\s*`), "");
     message = message.replace(new RegExp(`^${sender}:\\s*`), "");
