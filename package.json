@@ -33,8 +33,8 @@
     "mkdir_win": "@if exist .build (rd /s /q .build && mkdir .build) else (mkdir .build)",
     "copy_assets_win": "@powershell Copy-Item -Path ^(\\\"src\\Install_NodeJS_Modules.bat\\\",\\\"src\\Run.bat\\\",\\\"src\\whitelist.json\\\",\\\"package.json\\\",\\\"LICENSE\\\",\\\"README.md\\\"^) -Destination \".build\" -Recurse",
     "build_win": "npm run clean_win && npm run mkdir_win 1>nul && node node_modules\\typescript\\bin\\tsc -p tsconfig.json && npm run copy_assets_win 1>nul && node modify-package.js",
-    "bundle": "npm run build && mkdir -p dist && (cd .build && zip -r ../dist/thirdeye-v$(node -p \"require('../package.json').version\").zip .)",
-    "bundle_win": "npm run build_win && if not exist dist mkdir dist && powershell -Command \"Compress-Archive -Path (Join-Path -Path (Resolve-Path .build) -ChildPath *) -DestinationPath dist/thirdeye-v$((Get-Content package.json | ConvertFrom-Json).version).zip -Force\"",
+    "bundle": "npm run build && mkdir -p dist && zip -r dist/thirdeye-v$(node -p \"require('./package.json').version\").zip .build local.env.example",
+    "bundle_win": "npm run build_win && if not exist dist mkdir dist && powershell -Command \"Compress-Archive -Path (Join-Path -Path (Resolve-Path .build) -ChildPath *), local.env.example -DestinationPath dist/thirdeye-v$((Get-Content package.json | ConvertFrom-Json).version).zip -Force\"",
     "release:patch": "npm version patch && npm run bundle",
     "release:minor": "npm version minor && npm run bundle",
     "release:major": "npm version major && npm run bundle"
