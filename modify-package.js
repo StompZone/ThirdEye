@@ -14,6 +14,7 @@ const packageData = {
     productName: originalPackageData.productName,
     description: originalPackageData.description,
     dependencies: originalPackageData.dependencies,
+    dependencies: originalPackageData.dependencies,
     type: "module",
 };
 
