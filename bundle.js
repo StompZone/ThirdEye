@@ -2,7 +2,7 @@ import { createWriteStream } from "fs";
 import archiver from "archiver";
 import packageJson from "./package.json" with { type: "json" };
 
-const outputZip = `dist/thirdeye-v${packageJson.version}.zip`;
+const outputZip = `dist/phoenixepsilon-v${packageJson.version}.zip`;
 const output = createWriteStream(outputZip);
 const archive = archiver("zip", { zlib: { level: 9 } });
 
