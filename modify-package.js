@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 
-const buildDir = "./build";
+const buildDir = "./.build";
 const packageFile = path.join(buildDir, "package.json");
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
