@@ -1,5 +1,6 @@
 import { readFileSync } from "fs";
 import { join } from "path";
+import { CSZETranslations } from "./CSZETranslations";
 
 /**
  * Interface for correction mapping
@@ -24,65 +25,15 @@ interface LocalizationFile {
     [key: string]: LocalizationEntry;
 }
 
-// Custom death message patterns
-const CUSTOM_DEATH_MESSAGES: CorrectionMap = {
-    // Mob deaths
-    "%entity.zombie.name%": "Zombie",
-    "%entity.skeleton.name%": "Skeleton",
-    "%entity.spider.name%": "Spider",
-    "%entity.enderman.name%": "Enderman",
-    "%entity.zombie_pigman.name%": "Zombie Pigman",
-    "%entity.iron_golem.name%": "Iron Golem",
-    "%entity.piglin_brute.name%": "Piglin Brute",
-    "%entity.piglin.name%": "Piglin",
-    "%entity.wither_skeleton.name%": "Wither Skeleton",
-    "%entity.bee.name%": "Bee",
-    "%entity.magma_cube.name%": "Magma Cube",
-    "%entity.zoglin.name%": "Zoglin",
-    "%entity.blaze.name%": "Blaze",
-    "%entity.polar_bear.name%": "Polar Bear",
-    "%entity.wolf.name%": "Wolf",
-    "%entity.guardian.name%": "Guardian",
-    "%entity.elder_guardian.name%": "Elder Guardian",
-    "%entity.stray.name%": "Stray",
-    "%entity.husk.name%": "Husk",
-    "%entity.pillager.name%": "Pillager",
-    "%entity.vex.name%": "Vex",
-    "%entity.evocation_illager.name%": "Evoker",
-    "%entity.vindicator.name%": "Vindicator",
-    "%entity.shulker.name%": "Shulker",
-    "%entity.ender_dragon.name%": "Ender Dragon",
-    "%entity.witch.name%": "Witch",
-    "%entity.warden.name%": "Warden",
-    "%entity.drowned.name%": "Drowned",
-    "%entity.breeze.name%": "Breeze",
-    "%entity.ravager.name%": "Ravager",
-
-    // Death reasons (these might be in the localization file, but adding them here ensures they work)
-    "death.attack.mob": "%1$s was slain by %2$s",
-    "death.attack.arrow": "%1$s was shot by %2$s",
-    "death.attack.indirectMagic": "%1$s was killed by %2$s using magic",
-    "death.attack.bullet": "%1$s was shot",
-    "death.attack.inWall": "%1$s suffocated in a wall",
-    "death.attack.explosion.player": "%1$s was blown up by %2$s",
-    "death.attack.onFire": "%1$s went up in flames",
-    "death.attack.player": "%1$s was slain by %2$s",
-    "death.attack.inFire": "%1$s went up in flames",
-    "death.attack.drown": "%1$s drowned",
-    "death.attack.outOfWorld": "%1$s fell out of the world",
-    "death.attack.sonicBoom.player": "%1$s was obliterated by a sonic boom while fighting %2$s",
-    "death.fell.accident.generic": "%1$s fell from a high place",
-    "death.attack.fall": "%1$s hit the ground too hard",
-    "death.attack.player.item": "%1$s was slain by %2$s using %3$s",
-    "death.attack.lava": "%1$s tried to swim in lava",
-    "death.attack.generic": "%1$s died",
-    "death.attack.flyIntoWall": "%1$s experienced kinetic energy",
-    "death.attack.wither": "%1$s withered away",
-    "death.attack.trident": "%1$s was impaled by %2$s",
-};
+/**
+ * Interface for CSZE custom translations
+ */
+interface CSZETranslations {
+    [key: string]: string;
+}
 
 /**
- * Load localizations from the en_US.json file
+ * Load standard Minecraft localizations from the en_US.json file
  * @returns Parsed localization data
  */
 function loadLocalizations(): LocalizationFile {
@@ -91,7 +42,7 @@ function loadLocalizations(): LocalizationFile {
         const fileContent = readFileSync(filePath, "utf-8");
         return JSON.parse(fileContent);
     } catch (error) {
-        console.error("Error loading localizations:", error);
+        console.error("Error loading standard localizations:", error);
         return {};
     }
 }
@@ -101,25 +52,36 @@ function loadLocalizations(): LocalizationFile {
  * @returns Correction map for text replacement
  */
 function buildCorrectionMap(): CorrectionMap {
-    const localizations = loadLocalizations();
-    const correctionMap: CorrectionMap = { ...CUSTOM_DEATH_MESSAGES };
+    // Start with the custom CSZE translations (higher priority)
+    const correctionMap: CorrectionMap = { ...CSZETranslations };
 
-    // Process localizations and convert to correction patterns
+    // Load standard localizations
+    const localizations = loadLocalizations();
+
+    // Process all keys in the CSZE translations for pattern matching
+    for (const [key, value] of Object.entries(CSZETranslations)) {
+        // Add pattern version with % wrapping
+        correctionMap[`%${key}%`] = value;
+    }
+
+    // Process standard localizations (lower priority)
     for (const [key, entry] of Object.entries(localizations)) {
-        // Skip if we already have a custom mapping
+        // Skip if we already have a custom mapping for this key
+        if (correctionMap[key] !== undefined) {
+            continue;
+        }
+
+        // Skip if we already have a pattern mapping for this key
         if (correctionMap[`%${key}%`] !== undefined) {
             continue;
         }
 
-        // Use the key as the pattern to match (Minecraft's internal identifiers)
-        // like "entity.zombie.name" which would appear in text
-        const pattern = "%" + key + "%";
-
         // Use the text as the replacement
         const replacement = entry.text;
 
-        // Add to correction map
-        correctionMap[pattern] = replacement;
+        // Add both direct key and pattern mappings
+        correctionMap[key] = replacement;
+        correctionMap[`%${key}%`] = replacement;
     }
 
     return correctionMap;
@@ -127,7 +89,7 @@ function buildCorrectionMap(): CorrectionMap {
 
 /**
  * Map of text patterns to corrected versions
- * This is built from the en_US.json localization file
+ * Built from the en_US.json and CSZETranslations
  */
 export const correction: CorrectionMap = buildCorrectionMap();
 
@@ -138,11 +100,21 @@ export const correction: CorrectionMap = buildCorrectionMap();
  * @returns Formatted message
  */
 function formatParameterizedMessage(template: string, params: string[]): string {
+    if (!params || params.length === 0) return template;
+
     // Replace %1$s, %2$s, etc. with the respective parameters
-    return template.replace(/%(\d+)\$s/g, (match, paramIndex) => {
+    let formatted = template.replace(/%(\d+)\$s/g, (match, paramIndex) => {
         const index = parseInt(paramIndex, 10) - 1;
         return index >= 0 && index < params.length ? params[index] : match;
     });
+
+    // Also handle simpler %s format (used in some messages)
+    let paramIndex = 0;
+    formatted = formatted.replace(/%s/g, () => {
+        return paramIndex < params.length ? params[paramIndex++] : "%s";
+    });
+
+    return formatted;
 }
 
 /**
@@ -157,13 +129,20 @@ export function autoCorrect(message: string, params: string[] = []): string {
 
     let correctedMessage = message;
 
-    // First, handle standard Minecraft localization format
-    // Example: %entity.zombie.name% -> Zombie
+    // Direct key check first (exact match for message keys)
+    if (correction[message] !== undefined) {
+        const value = correction[message];
+        return formatParameterizedMessage(value, params);
+    }
+
+    // Look for translatable patterns in the message
     for (const [key, value] of Object.entries(correction)) {
+        // Skip keys that are unlikely to be in the middle of text (optimization)
+        if (!key.includes(".") && !key.startsWith("%")) continue;
+
         correctedMessage = correctedMessage.replace(
-            new RegExp(key, "g"),
-            // If the value contains parameter placeholders, format it
-            value.includes("%1$s") ? formatParameterizedMessage(value, params) : value
+            new RegExp(key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g"), // Escape special regex chars
+            (match) => formatParameterizedMessage(value, params)
         );
     }
 

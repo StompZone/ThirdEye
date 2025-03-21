@@ -1,17 +1,58 @@
 import { EmbedBuilder, TextBasedChannel } from "discord.js";
-import config from "../config.js";
 import { Client } from "bedrock-protocol";
+import config from "../config.js";
+import { autoCorrect } from "../utils/text_corrections";
+
+interface RawText {
+    text?: string;
+    translate?: string;
+    with?: {
+        rawtext?: Array<{ text: string }>;
+    };
+}
+
+interface WhisperPacket {
+    type: string;
+    message: string;
+}
+
+interface ChatPacket {
+    type: string;
+    message: string;
+}
+
+interface JsonPacket {
+    type: string;
+    message: string;
+}
 
 const excludedPackets: string[] = ["commands.tp.successVictim", "gameMode.changed", "commands.give.successRecipient"];
 
-function handleTextEvent(packet: WhisperPacket | ChatPacket | JsonPacket, systemCommandsChannelId: TextBasedChannel) {
-    let rawtext: RawText[] = []; // Declare rawtext outside the if block
+/**
+ * Check if the message is a system command
+ */
+function isSystemCommand(rawtext: RawText[]): boolean {
+    return rawtext?.length > 0 && rawtext[0]?.text === "§e" && !excludedPackets.includes(rawtext?.[3]?.translate || "");
+}
 
+function handleTextEvent(packet: WhisperPacket | ChatPacket | JsonPacket, systemCommandsChannelId: TextBasedChannel) {
+    let rawtext: RawText[] = []; // Declare rawtext array
+
+    // Parse rawtext from packet
     if (packet.type === "json_whisper" || packet.type === "json") {
-        const { rawtext: whisperRawText } = JSON.parse(packet.message);
-        rawtext = whisperRawText;
+        try {
+            const parsedMessage = JSON.parse(packet.message);
+            rawtext = parsedMessage.rawtext || [];
+        } catch (e) {
+            console.error("Error parsing JSON message:", e);
+            return;
+        }
     } else if (packet.type === "chat") {
         rawtext = [{ text: packet.message }];
+    }
+
+    if (!isSystemCommand(rawtext)) {
+        return;
     }
 
     if (excludedPackets.some((excludedPacket) => packet.message.includes(excludedPacket))) {
@@ -20,14 +61,19 @@ function handleTextEvent(packet: WhisperPacket | ChatPacket | JsonPacket, system
 
     let systemMessage: string;
     let successMessage: string;
-    let results: string[];
+    let results: string[] = [];
     const playerName = rawtext?.[1]?.translate || "Server";
 
     if (packet.type === "json") {
-        const rawtextArray = rawtext[3]?.with?.rawtext?.map((item) => item.text) || [];
+        const rawtextArray = rawtext[3]?.with?.rawtext?.map((item: { text: string }) => item.text) || [];
         results = rawtextArray.filter(Boolean);
         systemMessage = results.join(" ");
         successMessage = rawtext?.[3]?.translate;
+    }
+
+    // Apply text correction to the success message if it's a translatable string
+    if (successMessage) {
+        successMessage = autoCorrect(successMessage, results);
     }
 
     let dontSendMessage = false;

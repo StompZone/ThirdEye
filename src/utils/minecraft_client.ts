@@ -1,8 +1,8 @@
 import { createClient, Client } from "bedrock-protocol";
 import { ConfigTemplate } from "../config.js";
-import { translateFromTTX, isTTXEncoded } from "../translation/translation.js";
 import { TextBasedChannel } from "discord.js";
 import { handleDisconnection } from "./message_handler";
+import { autoCorrect } from "./text_corrections";
 
 /**
  * Creates and configures a Minecraft client based on the provided configuration
@@ -89,6 +89,7 @@ export function setupClientEventHandlers(bot: Client, channelId: TextBasedChanne
 
         const message = packet.message;
         const sender = packet.source_name;
+        const params = packet.parameters || [];
 
         // Skip messages that originated from Discord (sent by the bot using /say)
         if (message.match(/\[(?:§[0-9a-lr])*Discord(?:§[0-9a-lr])*\]/)) {
@@ -99,15 +100,11 @@ export function setupClientEventHandlers(bot: Client, channelId: TextBasedChanne
         let cleanMessage = message.replace(new RegExp(`^\\[${sender}\\]\\s*`), "");
         cleanMessage = cleanMessage.replace(new RegExp(`^${sender}:\\s*`), "");
 
-        // Handle TTX encoded messages
-        let displayMessage = cleanMessage;
-        if (isTTXEncoded(cleanMessage)) {
-            const originalMessage = translateFromTTX(cleanMessage);
-            displayMessage = `${cleanMessage} [TTX: ${originalMessage}]`;
-        }
+        // Apply text corrections and handle translations
+        cleanMessage = autoCorrect(cleanMessage, params);
 
-        // Send to Discord
-        const discordMessage = `**${sender}**: ${displayMessage}`;
+        // Send message to Discord
+        const discordMessage = `**${sender}**: ${cleanMessage}`;
         channelId.send(discordMessage).catch(console.error);
     });
 }
