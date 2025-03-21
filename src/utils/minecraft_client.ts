@@ -2,7 +2,7 @@ import { createClient, Client } from "bedrock-protocol";
 import { ConfigTemplate } from "../config.js";
 import { TextBasedChannel } from "discord.js";
 import { handleDisconnection } from "./message_handler.js";
-import { autoCorrect } from "./text_corrections.js";
+import { processMinecraftMessage } from "./text_corrections.js";
 
 /**
  * Creates and configures a Minecraft client based on the provided configuration
@@ -100,8 +100,8 @@ export function setupClientEventHandlers(bot: Client, channelId: TextBasedChanne
         let cleanMessage = message.replace(new RegExp(`^\\[${sender}\\]\\s*`), "");
         cleanMessage = cleanMessage.replace(new RegExp(`^${sender}:\\s*`), "");
 
-        // Apply text corrections and handle translations
-        cleanMessage = autoCorrect(cleanMessage, params);
+        // Process the message with TTX decoding and text corrections
+        cleanMessage = processMinecraftMessage(cleanMessage, params);
 
         // Send message to Discord
         const discordMessage = `**${sender}**: ${cleanMessage}`;

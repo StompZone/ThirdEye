@@ -33,12 +33,89 @@ interface CSZETranslations {
 }
 
 /**
+ * Translates text from TTX encoding back to regular text
+ * @param message The TTX encoded message
+ * @returns Decoded regular text
+ */
+export function decodeTTX(message: string): string {
+    const chars = Array.from(message);
+    let skipflag = 0;
+    const originalMsg: string[] = [];
+
+    for (let i = 0; i < chars.length; i++) {
+        const c = chars[i];
+        // Skip Minecraft formatting codes (§ followed by a character)
+        if (c === "§") {
+            originalMsg.push(c);
+            skipflag = 1;
+            continue;
+        }
+        if (skipflag === 1) {
+            originalMsg.push(c);
+            skipflag = 0;
+            continue;
+        }
+        const code = c.charCodeAt(0);
+        if (code >= 10273 && code <= 10366) {
+            originalMsg.push(String.fromCharCode(code - 10240));
+        } else {
+            originalMsg.push(c);
+        }
+    }
+    return originalMsg.join("");
+}
+
+/**
+ * Encodes text to TTX format
+ * @param message The regular message
+ * @returns TTX encoded text
+ */
+export function encodeTTX(message: string): string {
+    const chars = Array.from(message);
+    let skipflag = 0;
+    const newMsg: string[] = [];
+
+    for (let i = 0; i < chars.length; i++) {
+        const c = chars[i];
+        if (c === "§") {
+            newMsg.push(c);
+            skipflag = 1;
+            continue;
+        }
+        if (skipflag === 1) {
+            newMsg.push(c);
+            skipflag = 0;
+            continue;
+        }
+        const code = c.charCodeAt(0);
+        if (code > 32 && code < 127) {
+            newMsg.push(String.fromCharCode(code + 10240));
+        } else {
+            newMsg.push(c);
+        }
+    }
+    return newMsg.join("");
+}
+
+/**
+ * Detects if a message contains TTX encoded text
+ * @param message The message to check
+ * @returns True if the message contains TTX encoded text
+ */
+export function hasTTXEncoding(message: string): boolean {
+    return Array.from(message).some((c) => {
+        const code = c.charCodeAt(0);
+        return code >= 10273 && code <= 10366;
+    });
+}
+
+/**
  * Load standard Minecraft localizations from the en_US.json file
  * @returns Parsed localization data
  */
 function loadLocalizations(): LocalizationFile {
     try {
-        const filePath = join(process.cwd(), "src", "../en_US.json");
+        const filePath = join(process.cwd(), "src", "en_US.json");
         const fileContent = readFileSync(filePath, "utf-8");
         return JSON.parse(fileContent);
     } catch (error) {
@@ -150,4 +227,29 @@ export function autoCorrect(message: string, params: string[] = []): string {
     correctedMessage = correctedMessage.replace(/§[0-9a-fklmnor]/g, "");
 
     return correctedMessage;
+}
+
+/**
+ * Comprehensive message processor that handles both TTX decoding and text corrections
+ *
+ * @param message The original message from Minecraft
+ * @param params Optional parameters for parameterized messages
+ * @returns Processed message with TTX decoded and text corrected
+ */
+export function processMinecraftMessage(message: string, params: string[] = []): string {
+    if (!message) return message;
+
+    let processedMessage = message;
+    let ttxDecoded = "";
+
+    // Check for TTX encoding and decode if present
+    if (hasTTXEncoding(message)) {
+        ttxDecoded = decodeTTX(message);
+        processedMessage = `${message} [TTX: ${ttxDecoded}]`;
+    }
+
+    // Apply text corrections
+    processedMessage = autoCorrect(processedMessage, params);
+
+    return processedMessage;
 }

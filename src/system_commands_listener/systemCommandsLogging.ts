@@ -1,7 +1,7 @@
 import { EmbedBuilder, TextBasedChannel } from "discord.js";
 import { Client } from "bedrock-protocol";
 
-import { autoCorrect } from "../utils/text_corrections.js";
+import { processMinecraftMessage } from "../utils/text_corrections.js";
 import { loadConfig } from "../configLoader.js";
 
 const config = loadConfig();
@@ -76,7 +76,12 @@ function handleTextEvent(packet: WhisperPacket | ChatPacket | JsonPacket, system
 
     // Apply text correction to the success message if it's a translatable string
     if (successMessage) {
-        successMessage = autoCorrect(successMessage, results);
+        successMessage = processMinecraftMessage(successMessage, results);
+    }
+
+    // Process system message for TTX encoding if present
+    if (systemMessage) {
+        systemMessage = processMinecraftMessage(systemMessage, []);
     }
 
     let dontSendMessage = false;
