@@ -38,7 +38,7 @@ interface CSZETranslations {
  */
 function loadLocalizations(): LocalizationFile {
     try {
-        const filePath = join(process.cwd(), "src", "en_US.json");
+        const filePath = join(process.cwd(), "src", "../en_US.json");
         const fileContent = readFileSync(filePath, "utf-8");
         return JSON.parse(fileContent);
     } catch (error) {

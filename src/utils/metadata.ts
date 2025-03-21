@@ -1,7 +1,16 @@
 // Gets information about Phoenix Epsilon itself
+import { readFileSync } from "fs";
+import { join, dirname } from "path";
+import { fileURLToPath } from "url";
 
 function getPackageJson() {
-    const packageJson = require("../../package.json");
+    // Get current file's directory
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = dirname(__filename);
+
+    // Read the package.json file
+    const packagePath = join(__dirname, "..", "..", "package.json");
+    const packageJson = JSON.parse(readFileSync(packagePath, "utf-8"));
     return packageJson;
 }
 
