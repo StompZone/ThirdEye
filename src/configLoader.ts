@@ -50,6 +50,7 @@ export function loadConfig(): ConfigTemplate {
         voiceAdminRoleID: envConfig.VOICE_ADMIN_ROLE_ID || defaultConfig.voiceAdminRoleID,
         logBadActors: parseBoolean(envConfig.LOG_BAD_ACTORS, defaultConfig.logBadActors),
         logoURL: envConfig.LOGO_URL || defaultConfig.logoURL,
+        clientId: envConfig.CLIENT_ID || defaultConfig.clientId,
     };
 
     // Validate required configurations
@@ -101,6 +102,7 @@ function validateConfig(config: ConfigTemplate): void {
         { field: "username", name: "Minecraft Username" },
         { field: "guild", name: "Discord Guild ID" },
         { field: "channel", name: "Discord Channel ID" },
+        { field: "clientId", name: "Discord Application Client ID" },
     ];
 
     const missingFields = criticalFields.filter(({ field }) => !config[field]).map(({ name }) => name);
