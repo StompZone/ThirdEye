@@ -1,8 +1,8 @@
 import { EmbedBuilder, TextBasedChannel } from "discord.js";
 import config from "../config.js";
 import { Client } from "bedrock-protocol";
-import { sendToChannel } from "../utils/discord_helpers";
-import { autoCorrect as applyLocalization } from "../utils/text_corrections";
+import { sendToChannel } from "../utils/discord_helpers.js";
+import { autoCorrect as applyLocalization } from "../utils/text_corrections.js";
 
 // Interface for text packets
 interface TextPacket {

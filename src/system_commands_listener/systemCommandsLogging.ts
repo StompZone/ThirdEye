@@ -1,7 +1,10 @@
 import { EmbedBuilder, TextBasedChannel } from "discord.js";
 import { Client } from "bedrock-protocol";
-import config from "../config.js";
-import { autoCorrect } from "../utils/text_corrections";
+
+import { autoCorrect } from "../utils/text_corrections.js";
+import { loadConfig } from "../configLoader.js";
+
+const config = loadConfig();
 
 interface RawText {
     text?: string;

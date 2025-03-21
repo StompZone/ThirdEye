@@ -1,9 +1,10 @@
 import { Client, GatewayIntentBits, TextBasedChannel } from "discord.js";
-import { ConfigTemplate } from "../config.js";
+
 import { registerCommands } from "../translation/registerCommands.js";
-import { handleCommand, handleChatMessage } from "./message_handler";
-import { handleWhitelistCommand } from "./whitelist_manager";
+import { handleCommand, handleChatMessage } from "./message_handler.js";
+import { handleWhitelistCommand } from "./whitelist_manager.js";
 import { checkAndDeleteEmptyChannels } from "../voiceChat_listener/voiceChatCleanUp.js";
+import { ConfigTemplate } from "../config.js";
 
 // Interface for channel configuration
 interface ChannelConfig {

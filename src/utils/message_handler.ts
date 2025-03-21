@@ -1,9 +1,12 @@
 import { EmbedBuilder, TextBasedChannel } from "discord.js";
 import { Client } from "bedrock-protocol";
-import config from "../config.js";
+import { loadConfig } from "../configLoader.js";
+
 import { idList } from "../badActors.js";
-import { parseColor } from "./color_utils";
-import { sendToChannel } from "./discord_helpers";
+import { parseColor } from "./color_utils.js";
+import { sendToChannel } from "./discord_helpers.js";
+
+const config = loadConfig();
 
 // Types for command requests
 interface CommandRequest {

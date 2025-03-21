@@ -1,6 +1,6 @@
 import { readFileSync } from "fs";
 import { join } from "path";
-import { CSZETranslations } from "./CSZETranslations";
+import { CSZETranslations } from "./CSZETranslations.js";
 
 /**
  * Interface for correction mapping

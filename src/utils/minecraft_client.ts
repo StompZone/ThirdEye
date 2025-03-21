@@ -1,8 +1,8 @@
 import { createClient, Client } from "bedrock-protocol";
 import { ConfigTemplate } from "../config.js";
 import { TextBasedChannel } from "discord.js";
-import { handleDisconnection } from "./message_handler";
-import { autoCorrect } from "./text_corrections";
+import { handleDisconnection } from "./message_handler.js";
+import { autoCorrect } from "./text_corrections.js";
 
 /**
  * Creates and configures a Minecraft client based on the provided configuration

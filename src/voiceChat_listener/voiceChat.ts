@@ -1,6 +1,9 @@
 import { Channel, ChannelType, Guild, GuildMember, PermissionsBitField } from "discord.js";
 import { Client } from "bedrock-protocol";
-import config from "../config.js";
+import { loadConfig } from "../configLoader.js";
+
+const config = loadConfig();
+
 export function setupVoiceChatListener(bot: Client, targetGuild: Guild) {
     //CreateVC
     bot.on("text", (packet) => {
