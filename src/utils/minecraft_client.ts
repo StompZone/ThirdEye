@@ -88,7 +88,7 @@ export function setupClientEventHandlers(bot: Client, channelId: TextBasedChanne
         }
 
         const message = packet.message;
-        const sender = packet.source_name;
+        const sender = packet.source_name || "Unknown";
         const params = packet.parameters || [];
 
         // Skip messages that originated from Discord (sent by the bot using /say)
@@ -96,15 +96,38 @@ export function setupClientEventHandlers(bot: Client, channelId: TextBasedChanne
             return;
         }
 
-        // Remove username patterns
-        let cleanMessage = message.replace(new RegExp(`^\\[${sender}\\]\\s*`), "");
-        cleanMessage = cleanMessage.replace(new RegExp(`^${sender}:\\s*`), "");
+        // Try to extract player name from JSON if available
+        let playerName = sender;
+        let messageContent = message;
+
+        // Check if this is a JSON message with rawtext
+        try {
+            if (message.startsWith("{") && message.includes("rawtext")) {
+                const parsed = JSON.parse(message);
+                if (parsed.rawtext && Array.isArray(parsed.rawtext)) {
+                    // Try to extract player name if message has format <Player> Message
+                    const fullText = parsed.rawtext.map((item: { text?: string }) => item.text || "").join("");
+
+                    const playerMatch = fullText.match(/<([^>]+)>/);
+                    if (playerMatch && playerMatch[1]) {
+                        playerName = playerMatch[1].trim();
+                        // Remove player name prefix from message
+                        messageContent = fullText.replace(/<[^>]+>\s*/, "");
+                    } else {
+                        messageContent = fullText;
+                    }
+                }
+            }
+        } catch (e) {
+            // If JSON parsing fails, continue with original message
+            console.log("Failed to parse JSON in minecraft_client:", e);
+        }
 
         // Process the message with TTX decoding and text corrections
-        cleanMessage = processMinecraftMessage(cleanMessage, params);
+        messageContent = processMinecraftMessage(messageContent, params);
 
         // Send message to Discord
-        const discordMessage = `**${sender}**: ${cleanMessage}`;
+        const discordMessage = `**${playerName}**: ${messageContent}`;
         channelId.send(discordMessage).catch(console.error);
     });
 }

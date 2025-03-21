@@ -115,7 +115,7 @@ export function hasTTXEncoding(message: string): boolean {
  */
 function loadLocalizations(): LocalizationFile {
     try {
-        const filePath = join(process.cwd(), "src", "en_US.json");
+        const filePath = join(process.cwd(), "src", "../en_US.json");
         const fileContent = readFileSync(filePath, "utf-8");
         return JSON.parse(fileContent);
     } catch (error) {
@@ -240,16 +240,30 @@ export function processMinecraftMessage(message: string, params: string[] = []):
     if (!message) return message;
 
     let processedMessage = message;
-    let ttxDecoded = "";
+
+    // Try to parse JSON content if the message appears to be JSON
+    if (message.startsWith("{") && message.includes("rawtext")) {
+        try {
+            const parsed = JSON.parse(message);
+            if (parsed.rawtext && Array.isArray(parsed.rawtext)) {
+                // Extract the actual text content from rawtext
+                const textContent = parsed.rawtext.map((item: { text?: string }) => item.text || "").join("");
+
+                processedMessage = textContent;
+            }
+        } catch (e) {
+            // If parsing fails, continue with the original message
+            console.log("Failed to parse JSON message:", e);
+        }
+    }
 
     // Check for TTX encoding and decode if present
-    if (hasTTXEncoding(message)) {
-        ttxDecoded = decodeTTX(message);
-        processedMessage = `${message} [TTX: ${ttxDecoded}]`;
+    if (hasTTXEncoding(processedMessage)) {
+        const decoded = decodeTTX(processedMessage);
+        // Don't append the original TTX text, just return the decoded version
+        return autoCorrect(decoded, params);
     }
 
     // Apply text corrections
-    processedMessage = autoCorrect(processedMessage, params);
-
-    return processedMessage;
+    return autoCorrect(processedMessage, params);
 }

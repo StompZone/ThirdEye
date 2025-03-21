@@ -1,6 +1,6 @@
 import { EmbedBuilder, MessageCreateOptions, MessagePayload, TextBasedChannel } from "discord.js";
 import config from "../config.js";
-import { autoCorrect } from "../utils/text_corrections.js";
+import { processMinecraftMessage } from "../utils/text_corrections.js";
 import { Client } from "bedrock-protocol";
 
 // Define proper interfaces
@@ -50,7 +50,7 @@ function parseAntiCheatMessage(packet: MessagePacket): AntiCheatMessage | null {
 
         // Extract any parameters from the message
         const params: string[] = extractParameters(rawText);
-        const correctedText = autoCorrect(rawText, params);
+        const correctedText = processMinecraftMessage(rawText, params);
 
         if (!correctedText) {
             return null;

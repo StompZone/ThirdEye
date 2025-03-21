@@ -2,7 +2,7 @@ import { EmbedBuilder, TextBasedChannel } from "discord.js";
 import config from "../config.js";
 import { Client } from "bedrock-protocol";
 import { sendToChannel } from "../utils/discord_helpers.js";
-import { autoCorrect as applyLocalization } from "../utils/text_corrections.js";
+import { processMinecraftMessage } from "../utils/text_corrections.js";
 
 // Interface for text packets
 interface TextPacket {
@@ -38,8 +38,8 @@ function processDeathMessage(packet: TextPacket, channelId: TextBasedChannel): v
         playername = "A tamed Animal";
     }
 
-    // Use the autoCorrect function to get the death reason
-    const correctedMessage = applyLocalization(packet.message, packet.parameters);
+    // Use the processMinecraftMessage function to get the death reason
+    const correctedMessage = processMinecraftMessage(packet.message, packet.parameters);
     const content = `[In Game] ${playername}: ${correctedMessage}`;
 
     if (config.useEmbed) {
