@@ -8,7 +8,7 @@ export async function execute(interaction: MessageContextMenuCommandInteraction)
     const content = targetMessage.content;
 
     if (!content) {
-        await interaction.reply({ content: "This message has no text to translate.", ephemeral: true });
+        await interaction.reply({ content: "This message has no text to translate." });
         return;
     }
 
@@ -20,6 +20,5 @@ export async function execute(interaction: MessageContextMenuCommandInteraction)
 
     await interaction.reply({
         content: `**${encoded ? "Decoded from" : "Encoded to"} TTX:**\n${translated}`,
-        ephemeral: true,
     });
 }
