@@ -28,6 +28,7 @@ export type ConfigTemplate = {
     voiceAdminRoleID: string;
     logBadActors: boolean;
     logoURL: string;
+    clientId: string; // Discord application client ID for slash commands
 };
 
 // Default configuration used as fallback
@@ -67,6 +68,7 @@ export const defaultConfig: ConfigTemplate = {
     logBadActors: true,
     //New logo image if you dont like it feel free to change it.
     logoURL: "https://i.imgur.com/XfoZ8XS.jpg",
+    clientId: "", // Discord application client ID
 };
 
 export default defaultConfig;

@@ -10,6 +10,9 @@ import { setupVoiceChatListener } from "./voiceChat_listener/voiceChat.js";
 import { checkAndDeleteEmptyChannels } from "./voiceChat_listener/voiceChatCleanUp.js";
 import { setupAntiCheatListener } from "./anticheat_listener/anticheat_logs.js";
 import { idList } from "./badActors.js";
+import { translateFromTTX, isTTXEncoded } from "./translation/translation.js";
+import { registerCommands } from "./translation/registerCommands.js";
+import { execute as executeTranslateCommand } from "./translation/translateContextMenu.js";
 
 /**
  * Validates the loaded configuration against the default configuration structure
@@ -140,6 +143,9 @@ client.once("ready", async (c) => {
     console.log(`Discord bot logged in as ${c.user.tag}`);
     console.log("Channel ID from config:", channel);
 
+    // Register context menu commands
+    await registerCommands().catch(console.error);
+
     try {
         const fetchedChannel = await client.channels.fetch(channel);
         if (!fetchedChannel?.isTextBased()) {
@@ -235,6 +241,12 @@ bot.on("text", (packet) => {
     // Remove username patterns like "[Username]" or "Username:" from the start of the message
     message = message.replace(new RegExp(`^\\[${sender}\\]\\s*`), "");
     message = message.replace(new RegExp(`^${sender}:\\s*`), "");
+
+    // Check if message contains TTX encoding and translate if needed
+    if (isTTXEncoded(message)) {
+        const originalMessage = translateFromTTX(message);
+        message = `${message} [TTX: ${originalMessage}]`;
+    }
 
     if (channelId) {
         const discordMessage = `**${sender}**: ${message}`;
@@ -428,3 +440,12 @@ export function autoCorrect(message: string): string {
     }
     return correctedMessage;
 }
+
+// Add command handler for the context menu command
+client.on("interactionCreate", async (interaction) => {
+    if (!interaction.isMessageContextMenuCommand()) return;
+
+    if (interaction.commandName === "Toggle TTX Translation") {
+        await executeTranslateCommand(interaction);
+    }
+});
