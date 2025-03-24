@@ -143,7 +143,7 @@ export function loadConfig(): ConfigTemplate {
         // Validate the configuration
         validateConfig(config);
 
-        logger.info("Configuration loaded successfully");
+        // logger.info("Configuration loaded successfully");
         return config;
     } catch (error) {
         logger.error(`Failed to load configuration: ${error.message}`);
