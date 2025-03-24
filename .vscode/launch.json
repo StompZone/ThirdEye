@@ -25,7 +25,7 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch ThirdEye",
+            "name": "Launch PhoenixEpsilon",
             "skipFiles": [
                 "<node_internals>/**"
             ],

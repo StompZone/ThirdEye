@@ -1,9 +1,11 @@
 import { EmbedBuilder, TextBasedChannel } from "discord.js";
-import config from "../config.js";
 import { Client } from "bedrock-protocol";
 import { sendToChannel } from "../utils/discord_helpers.js";
 import { processMinecraftMessage } from "../utils/text_corrections.js";
 import { ITextPacket } from "../interface/interfaces.i.js";
+import { loadConfig } from "../core/config/configLoader.js";
+
+export const config = loadConfig();
 
 /**
  * Sets up a listener for death messages in the Minecraft chat
