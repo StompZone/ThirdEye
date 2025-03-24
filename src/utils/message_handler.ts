@@ -1,4 +1,4 @@
-import { Client } from "bedrock-protocol";
+import { Client as BedrockClient } from "bedrock-protocol";
 import { EmbedBuilder, TextBasedChannel } from "discord.js";
 import { idList } from "../services/anticheat/AntiCheatService.js";
 import { loadConfig } from "../core/config/configLoader.js";
@@ -16,7 +16,7 @@ const config = loadConfig();
  * @param bot The Minecraft client to send commands to
  * @param cmdPrefix The command prefix to use
  */
-export function handleCommand(message: IDiscordMessage, isAdmin: boolean, isAnticheatChannel: boolean, bot: Client, cmdPrefix: string): void {
+export function handleCommand(message: IDiscordMessage, isAdmin: boolean, isAnticheatChannel: boolean, bot: BedrockClient, cmdPrefix: string): void {
     if (!isAdmin || !isAnticheatChannel) return;
 
     const command: string = message.content.startsWith(cmdPrefix + "/") ? message.content.slice(2) : message.content.slice(cmdPrefix.length);
@@ -42,7 +42,7 @@ export function handleCommand(message: IDiscordMessage, isAdmin: boolean, isAnti
  * @param bot The Minecraft client to send messages to
  * @param anticheatChannelId The anticheat channel to log to (if needed)
  */
-export function handleChatMessage(message: IDiscordMessage & { author: { username: string } }, bot: Client, anticheatChannelId?: TextBasedChannel): void {
+export function handleChatMessage(message: IDiscordMessage & { author: { username: string } }, bot: BedrockClient, anticheatChannelId?: TextBasedChannel): void {
     const isBadActor: boolean = idList.includes(message.author.id);
     const cmd: string = isBadActor ? `/say §8[§9Discord§8] §4${message.author.username} (Known Hacker/Troll) : §f${message.content}` : `/say §8[§9Discord§8] §7${message.author.username}: §f${message.content}`;
 

@@ -1,4 +1,5 @@
-import { Client, EmbedBuilder, MessageCreateOptions, MessagePayload, TextBasedChannel } from "discord.js";
+import { EmbedBuilder, MessageCreateOptions, MessagePayload, TextBasedChannel } from "discord.js";
+import { Client as BedrockClient } from "bedrock-protocol";
 import { loadConfig } from "../core/config/configLoader.js";
 import { IAntiCheatMessage, IMessagePacket } from "../core/types/interfaces.js";
 import { processMinecraftMessage } from "../utils/text_corrections.js";
@@ -17,7 +18,7 @@ const THUMBNAIL_MAPPING = [
 
 const config = loadConfig();
 
-export function setupAntiCheatListener(bot: Client, channelId: TextBasedChannel) {
+export function setupAntiCheatListener(bot: BedrockClient, channelId: TextBasedChannel) {
     bot.on("text", (packet: IMessagePacket) => {
         const antiCheatMessage = parseAntiCheatMessage(packet);
         if (antiCheatMessage) {

@@ -1,4 +1,4 @@
-import { Client } from "bedrock-protocol";
+import { Client as BedrockClient } from "bedrock-protocol";
 import { Guild, VoiceChannel } from "discord.js";
 import { loadConfig } from "../core/config/configLoader.js";
 import { logger } from "../core/logging/logger.js";
@@ -15,11 +15,11 @@ const voiceChannelService = new VoiceChannelService();
 const discordMemberService = new DiscordMemberService();
 const minecraftCommandService = new MinecraftCommandService();
 
-export function setupVoiceChatListener(bot: Client, targetGuild: Guild) {
+export function setupVoiceChatListener(bot: BedrockClient, targetGuild: Guild) {
     bot.on("text", (packet) => handleTextPacket(packet, bot, targetGuild));
 }
 
-async function handleTextPacket(packet: IMessagePacket, bot: Client, guild: Guild) {
+async function handleTextPacket(packet: IMessagePacket, bot: BedrockClient, guild: Guild) {
     const messageHandler = getMessageHandler(packet.type);
     if (!messageHandler) return;
 
@@ -31,7 +31,7 @@ async function handleTextPacket(packet: IMessagePacket, bot: Client, guild: Guil
 }
 
 type MessageHandlerType = {
-    [K in IMessagePacket["type"]]: (packet: IMessagePacket, bot: Client, guild: Guild) => Promise<void>;
+    [K in IMessagePacket["type"]]: (packet: IMessagePacket, bot: BedrockClient, guild: Guild) => Promise<void>;
 };
 
 function getMessageHandler(type: IMessagePacket["type"]): MessageHandlerType[IMessagePacket["type"]] {
@@ -42,7 +42,7 @@ function getMessageHandler(type: IMessagePacket["type"]): MessageHandlerType[IMe
     return handlers[type];
 }
 
-async function handleJsonWhisperMessage(packet: IMessagePacket, bot: Client, guild: Guild) {
+async function handleJsonWhisperMessage(packet: IMessagePacket, bot: BedrockClient, guild: Guild) {
     const { command, requester, args } = parseJsonWhisperCommand(packet);
 
     switch (command) {
@@ -55,7 +55,7 @@ async function handleJsonWhisperMessage(packet: IMessagePacket, bot: Client, gui
     }
 }
 
-async function handleChatMessage(packet: IMessagePacket, bot: Client, guild: Guild) {
+async function handleChatMessage(packet: IMessagePacket, bot: BedrockClient, guild: Guild) {
     const { command, args } = parseChatCommand(packet);
     const requester = packet.source_name;
 
@@ -69,7 +69,7 @@ async function handleChatMessage(packet: IMessagePacket, bot: Client, guild: Gui
     }
 }
 
-async function handleCreateVoiceChannel(requester: string, args: string[], bot: Client, guild: Guild) {
+async function handleCreateVoiceChannel(requester: string, args: string[], bot: BedrockClient, guild: Guild) {
     const [channelName, ...memberNames] = args;
 
     try {
@@ -104,7 +104,7 @@ async function handleCreateVoiceChannel(requester: string, args: string[], bot: 
     }
 }
 
-async function handleInviteToChannel(requester: string, args: string[], bot: Client, guild: Guild) {
+async function handleInviteToChannel(requester: string, args: string[], bot: BedrockClient, guild: Guild) {
     const [channelName, invitedUser] = args;
 
     try {

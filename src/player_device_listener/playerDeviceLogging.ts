@@ -1,4 +1,4 @@
-import { Client } from "bedrock-protocol";
+import { Client as BedrockClient } from "bedrock-protocol";
 import { EmbedBuilder, MessageCreateOptions, MessagePayload, TextBasedChannel } from "discord.js";
 import { loadConfig } from "../core/config/configLoader.js";
 
@@ -8,7 +8,12 @@ and returns it sends the message again.
 */
 const Debug: boolean = false;
 
-export function addPlayerListener(bot: Client, channelId: TextBasedChannel, WhitelistRead: any) {
+interface PlayerData {
+    username: string;
+    device_os: string;
+}
+
+export function addPlayerListener(bot: BedrockClient, channelId: TextBasedChannel, WhitelistRead: any) {
     const Whitelist = WhitelistRead.whitelist;
     const config = loadConfig();
     bot.on("add_player", (packet: PlayerData) => {

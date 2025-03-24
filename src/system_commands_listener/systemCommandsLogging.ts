@@ -1,4 +1,4 @@
-import { Client } from "bedrock-protocol";
+import { Client as BedrockClient } from "bedrock-protocol";
 import { EmbedBuilder, TextBasedChannel } from "discord.js";
 
 import { loadConfig } from "../core/config/configLoader.js";
@@ -179,6 +179,6 @@ function getPotionResult(result: string): string {
     return result.replace(/%potion|\./g, "");
 }
 
-export function setupSystemCommandsListener(bot: Client, systemCommandsChannelId: TextBasedChannel) {
+export function setupSystemCommandsListener(bot: BedrockClient, systemCommandsChannelId: TextBasedChannel) {
     bot.on("text", (packet: IWhisperPacket | IChatPacket | IJsonPacket) => handleTextEvent(packet, systemCommandsChannelId));
 }

@@ -1,9 +1,9 @@
-import { Client } from "bedrock-protocol";
+import { Client as BedrockClient } from "bedrock-protocol";
 import { logger } from "../../core/logging/logger.js";
 import { IMinecraftCommandRequest } from "../../core/types/interfaces.js";
 
 export class MinecraftCommandService {
-    sendCommand(bot: Client, command: string): void {
+    sendCommand(bot: BedrockClient, command: string): void {
         try {
             const commandRequest: IMinecraftCommandRequest = {
                 command,
@@ -24,7 +24,7 @@ export class MinecraftCommandService {
         }
     }
 
-    sendMessage(bot: Client, target: string, message: string): void {
+    sendMessage(bot: BedrockClient, target: string, message: string): void {
         try {
             // Escape any quotes in the message to prevent command injection
             const escapedMessage = message.replace(/"/g, '\\"');

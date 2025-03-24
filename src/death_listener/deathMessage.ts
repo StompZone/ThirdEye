@@ -1,4 +1,4 @@
-import { Client } from "bedrock-protocol";
+import { Client as BedrockClient } from "bedrock-protocol";
 import { EmbedBuilder, TextBasedChannel } from "discord.js";
 import { loadConfig } from "../core/config/configLoader.js";
 import { ITextPacket } from "../core/types/interfaces.js";
@@ -12,7 +12,7 @@ export const config = loadConfig();
  * @param bot The Minecraft client
  * @param channelId The Discord channel to send messages to
  */
-export function setupDeathListener(bot: Client, channelId: TextBasedChannel): void {
+export function setupDeathListener(bot: BedrockClient, channelId: TextBasedChannel): void {
     bot.on("text", (packet: ITextPacket) => {
         if (!packet.message.includes("death")) {
             return;
