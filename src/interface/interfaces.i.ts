@@ -1,5 +1,5 @@
 import { TextBasedChannel, Channel } from "discord.js";
-import { AntiCheatSource } from "../anticheat_listener/anticheat_logs";
+import { AntiCheatSource } from "../anticheat_listener/anticheat_logs.js";
 
 export interface ILogger {
     log: (message: string) => void;

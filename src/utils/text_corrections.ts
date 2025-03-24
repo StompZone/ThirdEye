@@ -2,7 +2,7 @@ import { readFileSync } from "fs";
 import { join } from "path";
 import { CSZETranslations } from "./CSZETranslations.js";
 import { ICorrectionMap, ILocalizationFile } from "../interface/interfaces.i.js";
-import { logger } from "../core/logging/logger";
+import { logger } from "../core/logging/logger.js";
 
 /**
  * Translates text from TTX encoding back to regular text

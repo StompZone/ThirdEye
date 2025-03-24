@@ -1,9 +1,9 @@
 import { TextBasedChannel } from "discord.js";
 import { EmbedBuilder } from "discord.js";
 import { Client } from "bedrock-protocol";
-import { ITextPacket } from "../../core/types/interfaces";
-import { logger } from "../../core/logging/logger";
-import { processMinecraftMessage } from "../../utils/text_corrections";
+import { ITextPacket } from "../../core/types/interfaces.js";
+import { logger } from "../../core/logging/logger.js";
+import { processMinecraftMessage } from "../../utils/text_corrections.js";
 
 export class DeathMessageService {
     setupListener(bot: Client, channel: TextBasedChannel): void {
