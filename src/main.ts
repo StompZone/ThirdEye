@@ -5,7 +5,7 @@ import { setupMinecraftClient, setupClientEventHandlers } from "./utils/minecraf
 import { setupDeathListener } from "./death_listener/deathMessage.js";
 import { addPlayerListener } from "./player_device_listener/playerDeviceLogging.js";
 import { setupSystemCommandsListener } from "./system_commands_listener/systemCommandsLogging.js";
-import { setupVoiceChatListener } from "./voiceChat_listener/voiceChat.js";
+import { setupVoiceChatListener } from "./handlers/onChat.js";
 import { setupAntiCheatListener } from "./anticheat_listener/anticheat_logs.js";
 import { loadWhitelist } from "./utils/whitelist_manager.js";
 import { programName, programVersion } from "./utils/metadata.js";

@@ -1,15 +1,12 @@
-import { TextBasedChannel } from "discord.js";
+import { TextBasedChannel, Channel } from "discord.js";
 import { AntiCheatSource } from "../anticheat_listener/anticheat_logs";
-import { ILocalizationEntry } from "./interfaces.i";
 
 export interface ILogger {
     log: (message: string) => void;
     error: (message: string) => void;
     close: () => void;
 } // Define proper interfaces
-export interface IMessagePacket {
-    message: string;
-}
+
 export interface IAntiCheatMessage {
     rawMessage: string;
     correctedText: string;
@@ -96,4 +93,33 @@ export interface ICSZETranslations {
 }
 export interface IWhitelistData {
     whitelist: string[];
+}
+
+export interface IMessagePacket {
+    message: string;
+    type: "json_whisper" | "chat";
+    source_name?: string;
+    needs_translation?: boolean;
+    xuid?: string;
+    platform_chat_id?: string;
+    filtered_message?: string;
+}
+
+export interface ParsedCommand {
+    command: string;
+    requester: string;
+    args: string[];
+}
+
+export interface DiscordMember {
+    id: string;
+    voice: {
+        channel: Channel | null;
+        setChannel: (channelId: string) => Promise<void>;
+        setMute: (muted: boolean) => Promise<void>;
+        setDeaf: (deafened: boolean) => Promise<void>;
+    };
+    user: {
+        username: string;
+    };
 }
