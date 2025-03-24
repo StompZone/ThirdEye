@@ -1,11 +1,11 @@
-import { loadConfig } from "./configLoader.js";
+import { loadConfig } from "./core/config/configLoader.js";
 import { validateConfig } from "./utils/config_validator.js";
 import { createDiscordClient, initializeDiscordClient, initializeChannels, setupDiscordEventHandlers } from "./utils/discord_client.js";
 import { setupMinecraftClient, setupClientEventHandlers } from "./utils/minecraft_client.js";
 import { setupDeathListener } from "./death_listener/deathMessage.js";
 import { addPlayerListener } from "./player_device_listener/playerDeviceLogging.js";
 import { setupSystemCommandsListener } from "./system_commands_listener/systemCommandsLogging.js";
-import { setupVoiceChatListener } from "./voiceChat_listener/voiceChat.js";
+import { setupVoiceChatListener } from "./handlers/onChat.js";
 import { setupAntiCheatListener } from "./anticheat_listener/anticheat_logs.js";
 import { loadWhitelist } from "./utils/whitelist_manager.js";
 import { programName, programVersion } from "./utils/metadata.js";

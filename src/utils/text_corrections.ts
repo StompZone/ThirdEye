@@ -1,7 +1,8 @@
 import { readFileSync } from "fs";
 import { join } from "path";
+import { logger } from "../core/logging/logger.js";
+import { ICorrectionMap, ILocalizationFile } from "../core/types/interfaces.js";
 import { CSZETranslations } from "./CSZETranslations.js";
-import { ICorrectionMap, ILocalizationFile } from "../interface/interfaces.i.js";
 
 /**
  * Translates text from TTX encoding back to regular text
@@ -208,33 +209,25 @@ export function autoCorrect(message: string, params: string[] = []): string {
  * @returns Processed message with TTX decoded and text corrected
  */
 export function processMinecraftMessage(message: string, params: string[] = []): string {
-    if (!message) return message;
+    try {
+        // Replace %s placeholders with actual values
+        let processedMessage = message;
+        params.forEach((param, index) => {
+            processedMessage = processedMessage.replace(`%${index + 1}`, param);
+        });
 
-    let processedMessage = message;
+        // Handle special cases
+        processedMessage = processedMessage
+            .replace(/%entity/g, "A tamed Animal")
+            .replace(/%d/g, "0")
+            .replace(/%s/g, "");
 
-    // Try to parse JSON content if the message appears to be JSON
-    if (message.startsWith("{") && message.includes("rawtext")) {
-        try {
-            const parsed = JSON.parse(message);
-            if (parsed.rawtext && Array.isArray(parsed.rawtext)) {
-                // Extract the actual text content from rawtext
-                const textContent = parsed.rawtext.map((item: { text?: string }) => item.text || "").join("");
+        // Clean up any remaining placeholders
+        processedMessage = processedMessage.replace(/%[a-zA-Z0-9]+/g, "");
 
-                processedMessage = textContent;
-            }
-        } catch (e) {
-            // If parsing fails, continue with the original message
-            console.log("Failed to parse JSON message:", e);
-        }
+        return processedMessage.trim();
+    } catch (error) {
+        logger.error(`Error processing Minecraft message: ${error.message}`);
+        return message; // Return original message if processing fails
     }
-
-    // Check for TTX encoding and decode if present
-    if (hasTTXEncoding(processedMessage)) {
-        const decoded = decodeTTX(processedMessage);
-        // Don't append the original TTX text, just return the decoded version
-        return autoCorrect(decoded, params);
-    }
-
-    // Apply text corrections
-    return autoCorrect(processedMessage, params);
 }

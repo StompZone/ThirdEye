@@ -1,5 +1,5 @@
 import { readFileSync, writeFileSync } from "fs";
-import { IWhitelistData } from "../interface/interfaces.i";
+import { IWhitelistData } from "../core/types/interfaces.js";
 
 /**
  * Loads the whitelist from the JSON file

@@ -1,21 +1,17 @@
 import { spawn } from "child_process";
-import { createLogger } from "./logger.js";
+import { logger } from "./core/logging/logger.js";
 
 function startMain() {
-    const logger = createLogger();
     const mainProcess = spawn("node", ["main.js"]);
 
     mainProcess.on("exit", (code) => {
-        logger.log(`main.js exited with code ${code}`);
-        logger.log("Restarting main.js...");
-
-        logger.close();
-
+        logger.info(`main.js exited with code ${code}`);
+        logger.info("Restarting main.js...");
         startMain();
     });
 
     mainProcess.stdout.on("data", (data) => {
-        logger.log(`[PHX LOG] ${data}`);
+        logger.info(`[PHX LOG] ${data}`);
     });
 
     mainProcess.stderr.on("data", (data) => {

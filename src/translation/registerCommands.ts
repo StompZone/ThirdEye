@@ -1,6 +1,6 @@
 import { REST, Routes } from "discord.js";
 import { data as translateContextMenu } from "./translateContextMenu.js";
-import { loadConfig } from "../configLoader.js";
+import { loadConfig } from "../core/config/configLoader.js";
 
 const config = loadConfig();
 

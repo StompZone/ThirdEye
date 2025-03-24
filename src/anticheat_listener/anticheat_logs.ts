@@ -1,8 +1,8 @@
 import { EmbedBuilder, MessageCreateOptions, MessagePayload, TextBasedChannel } from "discord.js";
-import config from "../config.js";
+import { Client as BedrockClient } from "bedrock-protocol";
+import { loadConfig } from "../core/config/configLoader.js";
+import { IAntiCheatMessage, IMessagePacket } from "../core/types/interfaces.js";
 import { processMinecraftMessage } from "../utils/text_corrections.js";
-import { Client } from "bedrock-protocol";
-import { IAntiCheatMessage, IMessagePacket } from "../interface/interfaces.i.js";
 
 export enum AntiCheatSource {
     Paradox = "Paradox",
@@ -16,7 +16,9 @@ const THUMBNAIL_MAPPING = [
     { pattern: /Nuker\/A|Scaffold\/A|KillAura\/A/, url: "https://i.imgur.com/oClQXNb.png" },
 ];
 
-export function setupAntiCheatListener(bot: Client, channelId: TextBasedChannel) {
+const config = loadConfig();
+
+export function setupAntiCheatListener(bot: BedrockClient, channelId: TextBasedChannel) {
     bot.on("text", (packet: IMessagePacket) => {
         const antiCheatMessage = parseAntiCheatMessage(packet);
         if (antiCheatMessage) {

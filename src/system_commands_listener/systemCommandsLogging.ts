@@ -1,9 +1,9 @@
+import { Client as BedrockClient } from "bedrock-protocol";
 import { EmbedBuilder, TextBasedChannel } from "discord.js";
-import { Client } from "bedrock-protocol";
 
+import { loadConfig } from "../core/config/configLoader.js";
+import { IChatPacket, IJsonPacket, IRawText, IWhisperPacket } from "../core/types/interfaces.js";
 import { processMinecraftMessage } from "../utils/text_corrections.js";
-import { loadConfig } from "../configLoader.js";
-import { IChatPacket, IJsonPacket, IRawText, IWhisperPacket } from "../interface/interfaces.i.js";
 
 const config = loadConfig();
 
@@ -179,6 +179,6 @@ function getPotionResult(result: string): string {
     return result.replace(/%potion|\./g, "");
 }
 
-export function setupSystemCommandsListener(bot: Client, systemCommandsChannelId: TextBasedChannel) {
+export function setupSystemCommandsListener(bot: BedrockClient, systemCommandsChannelId: TextBasedChannel) {
     bot.on("text", (packet: IWhisperPacket | IChatPacket | IJsonPacket) => handleTextEvent(packet, systemCommandsChannelId));
 }
