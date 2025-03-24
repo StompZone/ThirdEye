@@ -93,3 +93,4 @@ export class AntiCheatService {
         return null;
     }
 }
+export const idList: string[] = ["804933185216577566"];

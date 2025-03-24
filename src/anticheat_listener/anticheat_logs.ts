@@ -1,8 +1,7 @@
-import { EmbedBuilder, MessageCreateOptions, MessagePayload, TextBasedChannel } from "discord.js";
+import { Client, EmbedBuilder, MessageCreateOptions, MessagePayload, TextBasedChannel } from "discord.js";
 import { loadConfig } from "../core/config/configLoader.js";
+import { IAntiCheatMessage, IMessagePacket } from "../core/types/interfaces.js";
 import { processMinecraftMessage } from "../utils/text_corrections.js";
-import { Client } from "bedrock-protocol";
-import { IAntiCheatMessage, IMessagePacket } from "../interface/interfaces.i.js";
 
 export enum AntiCheatSource {
     Paradox = "Paradox",

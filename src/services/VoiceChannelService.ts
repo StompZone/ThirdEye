@@ -1,4 +1,4 @@
-import { Guild, Channel, ChannelType, PermissionsBitField } from "discord.js";
+import { Channel, ChannelType, Guild, PermissionsBitField } from "discord.js";
 import { loadConfig } from "../core/config/configLoader.js";
 
 const config = loadConfig();

@@ -1,4 +1,4 @@
-import { TextBasedChannel, Channel } from "discord.js";
+import { Channel, TextBasedChannel } from "discord.js";
 
 // ============= Core Interfaces =============
 export interface ILogger {

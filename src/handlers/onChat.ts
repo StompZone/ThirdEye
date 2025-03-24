@@ -1,12 +1,12 @@
 import { Client } from "bedrock-protocol";
 import { Guild, VoiceChannel } from "discord.js";
 import { loadConfig } from "../core/config/configLoader.js";
-import { VoiceChannelService } from "../services/discord/VoiceChannelService.js";
-import { DiscordMemberService } from "../services/discord/DiscordMemberService.js";
-import { MinecraftCommandService } from "../services/minecraft/MinecraftCommandService.js";
-import { IMessagePacket, DiscordMember } from "../core/types/interfaces.js";
 import { logger } from "../core/logging/logger.js";
-import { parseJsonWhisperCommand, parseChatCommand } from "../utils/commandParser.js";
+import { DiscordMember, IMessagePacket } from "../core/types/interfaces.js";
+import { DiscordMemberService } from "../services/discord/DiscordMemberService.js";
+import { VoiceChannelService } from "../services/discord/VoiceChannelService.js";
+import { MinecraftCommandService } from "../services/minecraft/MinecraftCommandService.js";
+import { parseChatCommand, parseJsonWhisperCommand } from "../utils/commandParser.js";
 
 export const config = loadConfig();
 

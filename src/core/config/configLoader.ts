@@ -1,8 +1,8 @@
+import * as dotenv from "dotenv";
 import fs from "fs";
 import path from "path";
-import * as dotenv from "dotenv";
-import { ConfigTemplate } from "./types.js";
 import { logger } from "../logging/logger.js";
+import { ConfigTemplate } from "./types.js";
 
 const DEFAULT_CONFIG: ConfigTemplate = {
     // Discord Configuration

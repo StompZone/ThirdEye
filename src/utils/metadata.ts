@@ -1,6 +1,6 @@
 // Gets information about Phoenix Epsilon itself
 import { readFileSync } from "fs";
-import { join, dirname } from "path";
+import { dirname, join } from "path";
 import { fileURLToPath } from "url";
 
 function getPackageJson() {

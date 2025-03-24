@@ -1,11 +1,11 @@
 import { Client } from "bedrock-protocol";
-import { TextBasedChannel, Guild, VoiceChannel } from "discord.js";
+import { Guild, TextBasedChannel, VoiceChannel } from "discord.js";
 import { AntiCheatService } from "../../services/anticheat/AntiCheatService.js";
-import { DeathMessageService } from "../../services/minecraft/DeathMessageService.js";
-import { PacketListenerService } from "../../services/minecraft/PacketListenerService.js";
-import { VoiceChannelService } from "../../services/discord/VoiceChannelService.js";
 import { DiscordMemberService } from "../../services/discord/DiscordMemberService.js";
+import { VoiceChannelService } from "../../services/discord/VoiceChannelService.js";
+import { DeathMessageService } from "../../services/minecraft/DeathMessageService.js";
 import { MinecraftCommandService } from "../../services/minecraft/MinecraftCommandService.js";
+import { PacketListenerService } from "../../services/minecraft/PacketListenerService.js";
 import { logger } from "../logging/logger.js";
 
 export class ServiceManager {

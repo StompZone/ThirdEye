@@ -1,5 +1,5 @@
 import { Guild, VoiceChannel, PermissionFlagsBits, ChannelType } from "discord.js";
-import { logger } from "../../core/logging/logger";
+import { logger } from "../../core/logging/logger.js";
 
 export class VoiceChannelService {
     async createPrivateChannel(guild: Guild, channelName: string, memberIds: string[]): Promise<VoiceChannel> {

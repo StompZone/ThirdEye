@@ -1,6 +1,6 @@
 import { Guild, VoiceChannel } from "discord.js";
-import { DiscordMember } from "../../core/types/interfaces";
-import { logger } from "../../core/logging/logger";
+import { DiscordMember } from "../../core/types/interfaces.js";
+import { logger } from "../../core/logging/logger.js";
 
 export class DiscordMemberService {
     async fetchMembers(guild: Guild, usernames: string[]): Promise<DiscordMember[]> {

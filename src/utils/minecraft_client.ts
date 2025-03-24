@@ -1,6 +1,6 @@
-import { createClient, Client } from "bedrock-protocol";
-import { ConfigTemplate } from "../core/config/types.js";
+import { Client, createClient } from "bedrock-protocol";
 import { TextBasedChannel } from "discord.js";
+import { ConfigTemplate } from "../core/config/types.js";
 import { handleDisconnection } from "./message_handler.js";
 import { processMinecraftMessage } from "./text_corrections.js";
 

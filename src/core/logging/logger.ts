@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
-import { fileURLToPath } from "url";
 import { dirname } from "path";
+import { fileURLToPath } from "url";
 import { ILogger } from "../types/interfaces";
 
 class Logger implements ILogger {

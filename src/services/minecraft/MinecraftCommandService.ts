@@ -1,6 +1,6 @@
 import { Client } from "bedrock-protocol";
-import { IMinecraftCommandRequest } from "../../core/types/interfaces";
-import { logger } from "../../core/logging/logger";
+import { logger } from "../../core/logging/logger.js";
+import { IMinecraftCommandRequest } from "../../core/types/interfaces.js";
 
 export class MinecraftCommandService {
     sendCommand(bot: Client, command: string): void {

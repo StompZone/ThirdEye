@@ -1,11 +1,10 @@
-import { EmbedBuilder, TextBasedChannel } from "discord.js";
 import { Client } from "bedrock-protocol";
+import { EmbedBuilder, TextBasedChannel } from "discord.js";
+import { idList } from "../services/anticheat/AntiCheatService.js";
 import { loadConfig } from "../core/config/configLoader.js";
-
-import { idList } from "../badActors.js";
+import { ICommandRequest, IDiscordMessage, IMinecraftCommandRequest } from "../core/types/interfaces.js";
 import { parseColor } from "./color_utils.js";
 import { sendToChannel } from "./discord_helpers.js";
-import { ICommandRequest, IDiscordMessage, IMinecraftCommandRequest } from "../interface/interfaces.i.js";
 
 const config = loadConfig();
 

@@ -1,7 +1,7 @@
 import { Client } from "bedrock-protocol";
-import { TextBasedChannel, Guild } from "discord.js";
-import { IMessagePacket, ITextPacket } from "../../core/types/interfaces.js";
+import { Guild, TextBasedChannel } from "discord.js";
 import { logger } from "../../core/logging/logger.js";
+import { IMessagePacket, ITextPacket } from "../../core/types/interfaces.js";
 
 type PacketHandler<T> = (packet: T, ...args: any[]) => void | Promise<void>;
 

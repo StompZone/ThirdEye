@@ -1,5 +1,5 @@
-import { IMessagePacket, ParsedCommand } from "../interface/interfaces.i.js";
 import { loadConfig } from "../core/config/configLoader.js";
+import { IMessagePacket, ParsedCommand } from "../core/types/interfaces.js";
 
 const config = loadConfig();
 
