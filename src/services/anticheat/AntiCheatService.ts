@@ -1,59 +1,51 @@
 import { TextBasedChannel } from "discord.js";
 import { EmbedBuilder } from "discord.js";
 import { Client } from "bedrock-protocol";
-import { IAntiCheatMessage, IMessagePacket, AntiCheatSource } from "../../core/types/interfaces";
+import { ITextPacket, AntiCheatSource } from "../../core/types/interfaces";
 import { logger } from "../../core/logging/logger";
 import { processMinecraftMessage } from "../../utils/text_corrections";
 
-interface ThumbnailMapping {
-    pattern: RegExp;
-    url: string;
-}
-
-const THUMBNAIL_MAPPINGS: ThumbnailMapping[] = [
+// Thumbnail mapping with regex patterns
+const THUMBNAIL_MAPPING = [
     { pattern: /has banned/, url: "https://i.imgur.com/F18zcLY.png" },
     { pattern: /has been unbanned\./, url: "https://i.imgur.com/0MNCVoM.png" },
     { pattern: /Nuker\/A|Scaffold\/A|KillAura\/A/, url: "https://i.imgur.com/oClQXNb.png" },
 ];
 
 export class AntiCheatService {
-    private excludedPackets: string[] = ["commands.tp.successVictim", "gameMode.changed", "commands.give.successRecipient"];
-
     setupListener(bot: Client, channel: TextBasedChannel): void {
-        bot.on("text", (packet: IMessagePacket) => {
-            const antiCheatMessage = this.parseAntiCheatMessage(packet);
-            if (antiCheatMessage) {
-                this.sendMessage(antiCheatMessage, channel);
-            }
+        bot.on("text", (packet: ITextPacket) => {
+            this.processAntiCheatMessage(packet, channel);
         });
     }
 
-    private parseAntiCheatMessage(packet: IMessagePacket): IAntiCheatMessage | null {
+    processAntiCheatMessage(packet: ITextPacket, channel: TextBasedChannel): void {
         try {
-            const message = packet.message;
-            const obj = JSON.parse(message);
-            const rawText = obj.rawtext?.[0]?.text || "";
-
-            if (!this.isAntiCheatMessage(rawText)) {
-                return null;
+            // Check if this is an anti-cheat message
+            if (!this.isAntiCheatMessage(packet.message)) {
+                return;
             }
 
-            const source = this.detectAntiCheatSource(rawText);
-            const params = this.extractParameters(rawText);
-            const correctedText = processMinecraftMessage(rawText, params);
+            // Detect the source
+            const source = this.detectAntiCheatSource(packet.message);
+            if (!source) {
+                return;
+            }
 
+            // Process and format the message
+            const correctedText = processMinecraftMessage(packet.message, packet.parameters);
             if (!correctedText) {
-                return null;
+                return;
             }
 
-            return {
-                rawMessage: rawText,
+            // Create and send the message
+            this.sendMessage(channel, {
+                rawMessage: packet.message,
                 correctedText,
                 source,
-            };
+            });
         } catch (error) {
-            logger.error(`Error parsing anti-cheat message: ${error.message}`);
-            return null;
+            logger.error(`Error processing anti-cheat message: ${error.message}`);
         }
     }
 
@@ -62,27 +54,16 @@ export class AntiCheatService {
         return antiCheatRegex.test(text);
     }
 
-    private detectAntiCheatSource(text: string): AntiCheatSource {
+    private detectAntiCheatSource(text: string): AntiCheatSource | null {
+        if (!this.isAntiCheatMessage(text)) {
+            return null;
+        }
         return text.includes("Scythe") ? AntiCheatSource.Scythe : AntiCheatSource.Paradox;
     }
 
-    private extractParameters(text: string): string[] {
-        const params: string[] = [];
-        const playerNameRegex = /(?:banned|kicked|reported by|using|detected on)\s+([A-Za-z0-9_]+)/g;
-        let match;
-
-        while ((match = playerNameRegex.exec(text)) !== null) {
-            if (match[1]) {
-                params.push(match[1]);
-            }
-        }
-
-        return params;
-    }
-
-    private sendMessage(message: IAntiCheatMessage, channel: TextBasedChannel): void {
+    private sendMessage(channel: TextBasedChannel, message: { rawMessage: string; correctedText: string; source: AntiCheatSource }): void {
         try {
-            const embed = this.createEmbed(message);
+            const embed = this.createEmbed(message.correctedText, message.source);
             channel.send({ embeds: [embed] }).catch((error) => {
                 logger.error(`Failed to send anti-cheat message: ${error.message}`);
             });
@@ -91,10 +72,11 @@ export class AntiCheatService {
         }
     }
 
-    private createEmbed(message: IAntiCheatMessage): EmbedBuilder {
-        const embed = new EmbedBuilder().setColor("#FF0000").setTitle("Anti-Cheat Alert").setDescription(`[In Game] ${message.source}: ${message.correctedText}`).setAuthor({ name: "‎", iconURL: "https://i.imgur.com/your-logo.png" });
+    private createEmbed(content: string, source: AntiCheatSource): EmbedBuilder {
+        const embed = new EmbedBuilder().setColor("#FF0000").setTitle(`${source} Anti-Cheat Alert`).setDescription(`[In Game] ${content}`).setAuthor({ name: "‎", iconURL: "https://i.imgur.com/your-logo.png" });
 
-        const thumbUrl = this.getThumbUrlForMessage(message.correctedText);
+        // Add thumbnail if we have a matching pattern
+        const thumbUrl = this.getThumbUrlForMessage(content);
         if (thumbUrl) {
             embed.setThumbnail(thumbUrl);
         }
@@ -103,7 +85,7 @@ export class AntiCheatService {
     }
 
     private getThumbUrlForMessage(content: string): string | null {
-        for (const { pattern, url } of THUMBNAIL_MAPPINGS) {
+        for (const { pattern, url } of THUMBNAIL_MAPPING) {
             if (pattern.test(content)) {
                 return url;
             }

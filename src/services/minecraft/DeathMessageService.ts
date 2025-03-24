@@ -9,12 +9,12 @@ export class DeathMessageService {
     setupListener(bot: Client, channel: TextBasedChannel): void {
         bot.on("text", (packet: ITextPacket) => {
             if (packet.message.includes("death")) {
-                this.handleDeathMessage(packet, channel);
+                this.processDeathMessage(packet, channel);
             }
         });
     }
 
-    private handleDeathMessage(packet: ITextPacket, channel: TextBasedChannel): void {
+    processDeathMessage(packet: ITextPacket, channel: TextBasedChannel): void {
         try {
             let playername = packet.parameters[0];
 
