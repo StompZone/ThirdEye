@@ -1,50 +1,39 @@
-import * as fs from "fs";
-import * as path from "path";
-import { fileURLToPath } from "url";
-import { dirname } from "path";
-import { logger } from "../logging/logger.js";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+import fs from "fs";
+import path from "path";
+import { logger } from "../logging/logger";
 
 export interface ConfigTemplate {
     token: string;
     guild: string;
     channel: string;
     username: string;
-    antiCheatEnabled: boolean;
-    antiCheatLogsChannel: string;
-    logSystemCommands: boolean;
-    systemCommandsChannel: string;
-    cmdPrefix: string;
-    admins: string[];
-    useEmbed: boolean;
-    setColor: string;
-    setTitle: string;
-    logoURL: string;
-    sendWhisperMessages: boolean;
+    host: string;
+    port: number;
+    version: string;
+    debug: boolean;
+    logLevel: string;
 }
 
-function validateConfig(config: Partial<ConfigTemplate>): ConfigTemplate {
-    const requiredFields: (keyof ConfigTemplate)[] = ["token", "guild", "channel", "username", "cmdPrefix", "admins"];
+function validateConfig(config: ConfigTemplate): void {
+    const requiredFields: (keyof ConfigTemplate)[] = ["token", "guild", "channel", "username", "host", "port", "version"];
 
-    const missingFields = requiredFields.filter((field) => !config[field]);
-    if (missingFields.length > 0) {
-        throw new Error(`Missing required config fields: ${missingFields.join(", ")}`);
+    for (const field of requiredFields) {
+        if (!config[field]) {
+            throw new Error(`Missing required config field: ${field}`);
+        }
     }
-
-    return config as ConfigTemplate;
 }
 
 export function loadConfig(): ConfigTemplate {
     try {
-        const configPath = path.join(__dirname, "../../../config.json");
-        const configFile = fs.readFileSync(configPath, "utf-8");
-        const config = JSON.parse(configFile);
+        const configPath = path.join(process.cwd(), "config.json");
+        const configData = fs.readFileSync(configPath, "utf-8");
+        const config = JSON.parse(configData) as ConfigTemplate;
 
-        return validateConfig(config);
+        validateConfig(config);
+        return config;
     } catch (error) {
         logger.error(`Failed to load config: ${error.message}`);
-        throw new Error(`Failed to load config: ${error.message}`);
+        throw error;
     }
 }
