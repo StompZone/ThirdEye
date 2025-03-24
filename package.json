@@ -29,7 +29,7 @@
     "format": "npx prettier --write --ignore-path .prettierignore ./",
     "clean": "rimraf .build",
     "copy:assets": "cpx \"./bin/*\" .build/bin && cpx \"./src/{*.json,*.bat}\" .build/",
-    "copy:root-files": "cpx \"./{package.json,local.env.example,LICENSE,README.md}\" .build/",
+    "copy:root-files": "cpx \"./{package.json,local.env.example,LICENSE,README.md,.npmrc}\" .build/",
     "build": "npm run clean && tsc -p tsconfig.json && npm run copy:assets && npm run copy:root-files && node modify-package.js",
     "bundle": "npm run build && node bundle.js",
     "release:patch": "npm version patch && npm run bundle",

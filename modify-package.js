@@ -11,12 +11,18 @@ const __dirname = path.dirname(__filename);
 
 const originalPackageData = JSON.parse(fs.readFileSync(path.join(__dirname, "package.json"), "utf-8"));
 
+const dependencies = {
+    ...originalPackageData.dependencies,
+    "bedrock-protocol": "git+https://github.com/PrismarineJS/bedrock-protocol.git",
+    "discord.js": "git+https://github.com/discordjs/discord.js.git",
+};
+
 const packageData = {
     name: originalPackageData.name,
     version: originalPackageData.version,
     productName: originalPackageData.productName,
     description: originalPackageData.description,
-    dependencies: originalPackageData.dependencies,
+    dependencies: dependencies,
     type: "module",
 };
 
