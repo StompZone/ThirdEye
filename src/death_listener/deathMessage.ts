@@ -1,22 +1,19 @@
+import { Client as BedrockClient } from "bedrock-protocol";
 import { EmbedBuilder, TextBasedChannel } from "discord.js";
-import config from "../config.js";
-import { Client } from "bedrock-protocol";
+import { loadConfig } from "../core/config/configLoader.js";
+import { ITextPacket } from "../core/types/interfaces.js";
 import { sendToChannel } from "../utils/discord_helpers.js";
 import { processMinecraftMessage } from "../utils/text_corrections.js";
 
-// Interface for text packets
-interface TextPacket {
-    message: string;
-    parameters: string[];
-}
+export const config = loadConfig();
 
 /**
  * Sets up a listener for death messages in the Minecraft chat
  * @param bot The Minecraft client
  * @param channelId The Discord channel to send messages to
  */
-export function setupDeathListener(bot: Client, channelId: TextBasedChannel): void {
-    bot.on("text", (packet: TextPacket) => {
+export function setupDeathListener(bot: BedrockClient, channelId: TextBasedChannel): void {
+    bot.on("text", (packet: ITextPacket) => {
         if (!packet.message.includes("death")) {
             return;
         }
@@ -30,7 +27,7 @@ export function setupDeathListener(bot: Client, channelId: TextBasedChannel): vo
  * @param packet The text packet containing death information
  * @param channelId The Discord channel to send the message to
  */
-function processDeathMessage(packet: TextPacket, channelId: TextBasedChannel): void {
+function processDeathMessage(packet: ITextPacket, channelId: TextBasedChannel): void {
     let playername = packet.parameters[0];
 
     // Handle special case for tamed animals

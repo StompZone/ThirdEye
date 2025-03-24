@@ -1,6 +1,6 @@
-import { createClient, Client } from "bedrock-protocol";
-import { ConfigTemplate } from "../config.js";
+import { Client as BedrockClient, createClient } from "bedrock-protocol";
 import { TextBasedChannel } from "discord.js";
+import { ConfigTemplate } from "../core/config/types.js";
 import { handleDisconnection } from "./message_handler.js";
 import { processMinecraftMessage } from "./text_corrections.js";
 
@@ -11,7 +11,7 @@ import { processMinecraftMessage } from "./text_corrections.js";
  * @param programName The name of the program to display in messages
  * @returns Configured Minecraft client
  */
-export function setupMinecraftClient(config: ConfigTemplate, programName: string): Client {
+export function setupMinecraftClient(config: ConfigTemplate, programName: string): BedrockClient {
     // Determine client connection options based on config
     const options = config.isRealm
         ? {
@@ -22,7 +22,7 @@ export function setupMinecraftClient(config: ConfigTemplate, programName: string
               profilesFolder: "authentication_tokens",
           }
         : {
-              host: config.ip,
+              host: config.host,
               port: config.port,
               username: config.username,
               offline: config.AuthType,
@@ -46,7 +46,7 @@ export function setupMinecraftClient(config: ConfigTemplate, programName: string
  * @param programName The name of the program to display in messages
  * @param username The minecraft username
  */
-export function setupClientEventHandlers(bot: Client, channelId: TextBasedChannel, anticheatChannelId: TextBasedChannel, programName: string, username: string): void {
+export function setupClientEventHandlers(bot: BedrockClient, channelId: TextBasedChannel, anticheatChannelId: TextBasedChannel, programName: string, username: string): void {
     // Global variables
     const globals = {
         clientGamemode: "",

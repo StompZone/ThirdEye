@@ -1,45 +1,12 @@
+import { Client as BedrockClient } from "bedrock-protocol";
 import { EmbedBuilder, TextBasedChannel } from "discord.js";
-import { Client } from "bedrock-protocol";
-import { loadConfig } from "../configLoader.js";
-
-import { idList } from "../badActors.js";
+import { idList } from "../services/anticheat/AntiCheatService.js";
+import { loadConfig } from "../core/config/configLoader.js";
+import { ICommandRequest, IDiscordMessage, IMinecraftCommandRequest } from "../core/types/interfaces.js";
 import { parseColor } from "./color_utils.js";
 import { sendToChannel } from "./discord_helpers.js";
 
 const config = loadConfig();
-
-// Types for command requests
-interface CommandRequest {
-    type: "chat";
-    needs_translation: boolean;
-    source_name: string;
-    xuid: string;
-    platform_chat_id: string;
-    message: string;
-    filtered_message: string;
-}
-
-interface MinecraftCommandRequest {
-    command: string;
-    origin: {
-        type: string;
-        uuid: string;
-        request_id: string;
-    };
-    internal: boolean;
-    version: number;
-}
-
-interface DiscordMessage {
-    content: string;
-    author: {
-        id: string;
-        username?: string;
-    };
-    channel?: {
-        id: string;
-    };
-}
 
 /**
  * Handles commands sent from Discord to Minecraft
@@ -49,7 +16,7 @@ interface DiscordMessage {
  * @param bot The Minecraft client to send commands to
  * @param cmdPrefix The command prefix to use
  */
-export function handleCommand(message: DiscordMessage, isAdmin: boolean, isAnticheatChannel: boolean, bot: Client, cmdPrefix: string): void {
+export function handleCommand(message: IDiscordMessage, isAdmin: boolean, isAnticheatChannel: boolean, bot: BedrockClient, cmdPrefix: string): void {
     if (!isAdmin || !isAnticheatChannel) return;
 
     const command: string = message.content.startsWith(cmdPrefix + "/") ? message.content.slice(2) : message.content.slice(cmdPrefix.length);
@@ -64,7 +31,7 @@ export function handleCommand(message: DiscordMessage, isAdmin: boolean, isAntic
         platform_chat_id: "",
         message: command,
         filtered_message: "",
-    } as CommandRequest);
+    } as ICommandRequest);
 
     console.log(`Command received: ${command} From: ${message.author.id}`);
 }
@@ -75,7 +42,7 @@ export function handleCommand(message: DiscordMessage, isAdmin: boolean, isAntic
  * @param bot The Minecraft client to send messages to
  * @param anticheatChannelId The anticheat channel to log to (if needed)
  */
-export function handleChatMessage(message: DiscordMessage & { author: { username: string } }, bot: Client, anticheatChannelId?: TextBasedChannel): void {
+export function handleChatMessage(message: IDiscordMessage & { author: { username: string } }, bot: BedrockClient, anticheatChannelId?: TextBasedChannel): void {
     const isBadActor: boolean = idList.includes(message.author.id);
     const cmd: string = isBadActor ? `/say §8[§9Discord§8] §4${message.author.username} (Known Hacker/Troll) : §f${message.content}` : `/say §8[§9Discord§8] §7${message.author.username}: §f${message.content}`;
 
@@ -89,7 +56,7 @@ export function handleChatMessage(message: DiscordMessage & { author: { username
         },
         internal: false,
         version: 52,
-    } as MinecraftCommandRequest);
+    } as IMinecraftCommandRequest);
 
     if (isBadActor && config.logBadActors && anticheatChannelId) {
         const msgEmbed: EmbedBuilder = new EmbedBuilder()

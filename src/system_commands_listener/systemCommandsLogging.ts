@@ -1,45 +1,23 @@
+import { Client as BedrockClient } from "bedrock-protocol";
 import { EmbedBuilder, TextBasedChannel } from "discord.js";
-import { Client } from "bedrock-protocol";
 
+import { loadConfig } from "../core/config/configLoader.js";
+import { IChatPacket, IJsonPacket, IRawText, IWhisperPacket } from "../core/types/interfaces.js";
 import { processMinecraftMessage } from "../utils/text_corrections.js";
-import { loadConfig } from "../configLoader.js";
 
 const config = loadConfig();
-
-interface RawText {
-    text?: string;
-    translate?: string;
-    with?: {
-        rawtext?: Array<{ text: string }>;
-    };
-}
-
-interface WhisperPacket {
-    type: string;
-    message: string;
-}
-
-interface ChatPacket {
-    type: string;
-    message: string;
-}
-
-interface JsonPacket {
-    type: string;
-    message: string;
-}
 
 const excludedPackets: string[] = ["commands.tp.successVictim", "gameMode.changed", "commands.give.successRecipient"];
 
 /**
  * Check if the message is a system command
  */
-function isSystemCommand(rawtext: RawText[]): boolean {
+function isSystemCommand(rawtext: IRawText[]): boolean {
     return rawtext?.length > 0 && rawtext[0]?.text === "§e" && !excludedPackets.includes(rawtext?.[3]?.translate || "");
 }
 
-function handleTextEvent(packet: WhisperPacket | ChatPacket | JsonPacket, systemCommandsChannelId: TextBasedChannel) {
-    let rawtext: RawText[] = []; // Declare rawtext array
+function handleTextEvent(packet: IWhisperPacket | IChatPacket | IJsonPacket, systemCommandsChannelId: TextBasedChannel) {
+    let rawtext: IRawText[] = []; // Declare rawtext array
 
     // Parse rawtext from packet
     if (packet.type === "json_whisper" || packet.type === "json") {
@@ -201,6 +179,6 @@ function getPotionResult(result: string): string {
     return result.replace(/%potion|\./g, "");
 }
 
-export function setupSystemCommandsListener(bot: Client, systemCommandsChannelId: TextBasedChannel) {
-    bot.on("text", (packet: WhisperPacket | ChatPacket | JsonPacket) => handleTextEvent(packet, systemCommandsChannelId));
+export function setupSystemCommandsListener(bot: BedrockClient, systemCommandsChannelId: TextBasedChannel) {
+    bot.on("text", (packet: IWhisperPacket | IChatPacket | IJsonPacket) => handleTextEvent(packet, systemCommandsChannelId));
 }

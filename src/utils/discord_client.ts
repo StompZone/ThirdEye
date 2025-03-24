@@ -1,17 +1,11 @@
 import { Client, GatewayIntentBits, TextBasedChannel } from "discord.js";
 
+import { ConfigTemplate } from "../core/config/types.js";
+import { IChannelConfig } from "../core/types/interfaces.js";
 import { registerCommands } from "../translation/registerCommands.js";
-import { handleCommand, handleChatMessage } from "./message_handler.js";
-import { handleWhitelistCommand } from "./whitelist_manager.js";
 import { checkAndDeleteEmptyChannels } from "../voiceChat_listener/voiceChatCleanUp.js";
-import { ConfigTemplate } from "../config.js";
-
-// Interface for channel configuration
-interface ChannelConfig {
-    mainChannel: TextBasedChannel | null;
-    anticheatChannel: TextBasedChannel | null;
-    systemCommandsChannel: TextBasedChannel | null;
-}
+import { handleChatMessage, handleCommand } from "./message_handler.js";
+import { handleWhitelistCommand } from "./whitelist_manager.js";
 
 /**
  * Creates and sets up the Discord client with proper intents
@@ -32,8 +26,8 @@ export function createDiscordClient(): Client {
  * @param config The application configuration
  * @returns Object containing channel references
  */
-export async function initializeChannels(client: Client, config: ConfigTemplate): Promise<ChannelConfig> {
-    const channels: ChannelConfig = {
+export async function initializeChannels(client: Client, config: ConfigTemplate): Promise<IChannelConfig> {
+    const channels: IChannelConfig = {
         mainChannel: null,
         anticheatChannel: null,
         systemCommandsChannel: null,
@@ -95,7 +89,7 @@ export async function initializeChannels(client: Client, config: ConfigTemplate)
  * @param bot Minecraft client
  * @param whitelistData Whitelist data object
  */
-export function setupDiscordEventHandlers(client: Client, config: ConfigTemplate, channels: ChannelConfig, bot: any, whitelistData: any): void {
+export function setupDiscordEventHandlers(client: Client, config: ConfigTemplate, channels: IChannelConfig, bot: any, whitelistData: any): void {
     // Handle incoming Discord messages
     client.on("messageCreate", (message) => {
         if (message.author.bot) return;
