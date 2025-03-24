@@ -1,5 +1,7 @@
 import { Guild, Channel, ChannelType, PermissionsBitField } from "discord.js";
-import { config } from "../handlers/onChat.js";
+import { loadConfig } from "../core/config/configLoader.js";
+
+const config = loadConfig();
 
 export class VoiceChannelService {
     async createPrivateChannel(guild: Guild, channelName: string, memberIDs: string[]) {
@@ -9,7 +11,7 @@ export class VoiceChannelService {
             name: channelName,
             type: ChannelType.GuildVoice,
             parent: category.id,
-            permissionOverwrites: this.buildPermissionOverwrites(memberIDs),
+            permissionOverwrites: this.buildPermissionOverwrites(guild, memberIDs),
         });
     }
 
@@ -17,7 +19,7 @@ export class VoiceChannelService {
         return guild.channels.cache.find((ch: Channel) => ch.type === ChannelType.GuildCategory && ch.name === config.voiceChannelsCategory);
     }
 
-    private buildPermissionOverwrites(memberIDs: string[]) {
+    private buildPermissionOverwrites(guild: Guild, memberIDs: string[]) {
         return [
             {
                 id: config.voiceAdminRoleID,

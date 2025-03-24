@@ -12,6 +12,9 @@ export interface ConfigTemplate {
     version: string;
     debug: boolean;
     logLevel: string;
+    voiceChannelsCategory: string;
+    voiceAdminRoleID: string;
+    voiceChannelCommandPrefix: string;
 }
 
 function validateConfig(config: ConfigTemplate): void {

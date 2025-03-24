@@ -1,5 +1,7 @@
 import { IMessagePacket, ParsedCommand } from "../interface/interfaces.i";
-import { config } from "../handlers/onChat.js";
+import { loadConfig } from "../core/config/configLoader.js";
+
+const config = loadConfig();
 
 export function parseJsonWhisperCommand(packet: IMessagePacket): ParsedCommand {
     const obj = JSON.parse(packet.message);
