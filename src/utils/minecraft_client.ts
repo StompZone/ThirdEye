@@ -1,5 +1,5 @@
 import { createClient, Client } from "bedrock-protocol";
-import { ConfigTemplate } from "../config.js";
+import { ConfigTemplate } from "../core/config/types.js";
 import { TextBasedChannel } from "discord.js";
 import { handleDisconnection } from "./message_handler.js";
 import { processMinecraftMessage } from "./text_corrections.js";
@@ -22,7 +22,7 @@ export function setupMinecraftClient(config: ConfigTemplate, programName: string
               profilesFolder: "authentication_tokens",
           }
         : {
-              host: config.ip,
+              host: config.host,
               port: config.port,
               username: config.username,
               offline: config.AuthType,

@@ -1,5 +1,5 @@
 import { EmbedBuilder, MessageCreateOptions, MessagePayload, TextBasedChannel } from "discord.js";
-import config from "../config.js";
+import { loadConfig } from "../core/config/configLoader.js";
 import { processMinecraftMessage } from "../utils/text_corrections.js";
 import { Client } from "bedrock-protocol";
 import { IAntiCheatMessage, IMessagePacket } from "../interface/interfaces.i.js";
@@ -15,6 +15,8 @@ const THUMBNAIL_MAPPING = [
     { pattern: /has been unbanned\./, url: "https://i.imgur.com/0MNCVoM.png" },
     { pattern: /Nuker\/A|Scaffold\/A|KillAura\/A/, url: "https://i.imgur.com/oClQXNb.png" },
 ];
+
+const config = loadConfig();
 
 export function setupAntiCheatListener(bot: Client, channelId: TextBasedChannel) {
     bot.on("text", (packet: IMessagePacket) => {

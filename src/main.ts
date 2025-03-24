@@ -1,4 +1,4 @@
-import { loadConfig } from "./configLoader.js";
+import { loadConfig } from "./core/config/configLoader.js";
 import { validateConfig } from "./utils/config_validator.js";
 import { createDiscordClient, initializeDiscordClient, initializeChannels, setupDiscordEventHandlers } from "./utils/discord_client.js";
 import { setupMinecraftClient, setupClientEventHandlers } from "./utils/minecraft_client.js";

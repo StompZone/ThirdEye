@@ -4,7 +4,7 @@ import { registerCommands } from "../translation/registerCommands.js";
 import { handleCommand, handleChatMessage } from "./message_handler.js";
 import { handleWhitelistCommand } from "./whitelist_manager.js";
 import { checkAndDeleteEmptyChannels } from "../voiceChat_listener/voiceChatCleanUp.js";
-import { ConfigTemplate } from "../config.js";
+import { ConfigTemplate } from "../core/config/types.js";
 import { IChannelConfig } from "../interface/interfaces.i.js";
 
 /**

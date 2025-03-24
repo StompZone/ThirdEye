@@ -2,7 +2,7 @@ import { EmbedBuilder, TextBasedChannel } from "discord.js";
 import { Client } from "bedrock-protocol";
 
 import { processMinecraftMessage } from "../utils/text_corrections.js";
-import { loadConfig } from "../configLoader.js";
+import { loadConfig } from "../core/config/configLoader.js";
 import { IChatPacket, IJsonPacket, IRawText, IWhisperPacket } from "../interface/interfaces.i.js";
 
 const config = loadConfig();

@@ -1,4 +1,53 @@
-import { defaultConfig, ConfigTemplate } from "../config.js";
+import { ConfigTemplate } from "../core/config/types.js";
+
+const DEFAULT_CONFIG: ConfigTemplate = {
+    // Discord Configuration
+    token: "",
+    guild: "",
+    channel: "",
+    clientId: "",
+    cmdPrefix: "!",
+    admins: [],
+
+    // Minecraft Configuration
+    username: "",
+    host: "",
+    port: 19132,
+    version: "1.20.0",
+    isRealm: false,
+    realmInviteCode: "",
+
+    // Feature Flags
+    debug: false,
+    antiCheatEnabled: true,
+    useSystemPlayerJoinMessage: false,
+    logSystemCommands: false,
+    sendWhisperMessages: false,
+    useEmbed: true,
+    AuthType: false,
+    logBadActors: true,
+
+    // Channel Configuration
+    antiCheatChannelId: "",
+    antiCheatLogsChannel: "",
+    systemCommandsChannel: "",
+
+    // Voice Channel Configuration
+    voiceChannelCommandPrefix: "$",
+    voiceChannelsCategory: "Voice Channels",
+    voiceAdminRoleID: "",
+
+    // UI Configuration
+    setColor: [0, 153, 255] as const,
+    setTitle: "Phoenix Epsilon",
+    logoURL: "https://i.imgur.com/XfoZ8XS.jpg",
+
+    // Device Configuration
+    blacklistDeviceTypes: [],
+
+    // Logging Configuration
+    logLevel: "info",
+};
 
 /**
  * Validates the loaded configuration against the default configuration structure
@@ -6,12 +55,12 @@ import { defaultConfig, ConfigTemplate } from "../config.js";
  * @returns Validated configuration with any missing properties filled from default
  */
 export function validateConfig(config: Partial<ConfigTemplate>): ConfigTemplate {
-    const validatedConfig = { ...defaultConfig };
+    const validatedConfig = { ...DEFAULT_CONFIG };
     let missingKeys: string[] = [];
     let warningShown = false;
 
     // Check all keys in default config exist in loaded config
-    Object.keys(defaultConfig).forEach((key) => {
+    Object.keys(DEFAULT_CONFIG).forEach((key) => {
         const typedKey = key as keyof ConfigTemplate;
         if (config[typedKey] === undefined) {
             missingKeys.push(key);
@@ -30,7 +79,7 @@ export function validateConfig(config: Partial<ConfigTemplate>): ConfigTemplate 
     const criticalConfigs = [
         { key: "token", value: validatedConfig.token, name: "Discord Bot Token" },
         { key: "username", value: validatedConfig.username, name: "Minecraft Username" },
-        { key: "ip", value: validatedConfig.ip, name: "Server IP" },
+        { key: "host", value: validatedConfig.host, name: "Server IP" },
         { key: "guild", value: validatedConfig.guild, name: "Discord Guild ID" },
         { key: "channel", value: validatedConfig.channel, name: "Discord Channel ID" },
     ];
@@ -49,7 +98,7 @@ export function validateConfig(config: Partial<ConfigTemplate>): ConfigTemplate 
     }
 
     // Check for extra keys that don't exist in default config
-    const extraKeys = Object.keys(config).filter((key) => !Object.prototype.hasOwnProperty.call(defaultConfig, key));
+    const extraKeys = Object.keys(config).filter((key) => !Object.prototype.hasOwnProperty.call(DEFAULT_CONFIG, key));
 
     if (extraKeys.length > 0) {
         console.warn(`⚠️ Found unknown configuration keys: ${extraKeys.join(", ")}. These will be ignored.`);

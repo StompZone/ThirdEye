@@ -1,6 +1,6 @@
 import { EmbedBuilder, TextBasedChannel } from "discord.js";
 import { Client } from "bedrock-protocol";
-import { loadConfig } from "../configLoader.js";
+import { loadConfig } from "../core/config/configLoader.js";
 
 import { idList } from "../badActors.js";
 import { parseColor } from "./color_utils.js";

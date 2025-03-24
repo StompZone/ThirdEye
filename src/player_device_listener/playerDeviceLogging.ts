@@ -1,6 +1,6 @@
 import { MessagePayload, MessageCreateOptions } from "discord.js";
 import { EmbedBuilder, TextBasedChannel } from "discord.js";
-import { loadConfig } from "../configLoader.js";
+import { loadConfig } from "../core/config/configLoader.js";
 import { Client } from "bedrock-protocol";
 
 /* Add to prevent the message being spammed this will allow the blacklist to work, 
