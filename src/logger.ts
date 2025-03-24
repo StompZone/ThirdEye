@@ -2,14 +2,9 @@ import * as fs from "fs";
 import * as path from "path";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
+import { ILogger } from "./interface/interfaces.i";
 
-interface Logger {
-    log: (message: string) => void;
-    error: (message: string) => void;
-    close: () => void;
-}
-
-export function createLogger(): Logger {
+export function createLogger(): ILogger {
     const __filename = fileURLToPath(import.meta.url);
     const __dirname = dirname(__filename);
 

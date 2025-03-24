@@ -2,19 +2,9 @@ import { EmbedBuilder, MessageCreateOptions, MessagePayload, TextBasedChannel } 
 import config from "../config.js";
 import { processMinecraftMessage } from "../utils/text_corrections.js";
 import { Client } from "bedrock-protocol";
+import { IAntiCheatMessage, IMessagePacket } from "../interface/interfaces.i.js";
 
-// Define proper interfaces
-interface MessagePacket {
-    message: string;
-}
-
-interface AntiCheatMessage {
-    rawMessage: string;
-    correctedText: string;
-    source: AntiCheatSource;
-}
-
-enum AntiCheatSource {
+export enum AntiCheatSource {
     Paradox = "Paradox",
     Scythe = "Scythe",
 }
@@ -27,7 +17,7 @@ const THUMBNAIL_MAPPING = [
 ];
 
 export function setupAntiCheatListener(bot: Client, channelId: TextBasedChannel) {
-    bot.on("text", (packet: MessagePacket) => {
+    bot.on("text", (packet: IMessagePacket) => {
         const antiCheatMessage = parseAntiCheatMessage(packet);
         if (antiCheatMessage) {
             sendMessage(antiCheatMessage, channelId);
@@ -35,7 +25,7 @@ export function setupAntiCheatListener(bot: Client, channelId: TextBasedChannel)
     });
 }
 
-function parseAntiCheatMessage(packet: MessagePacket): AntiCheatMessage | null {
+function parseAntiCheatMessage(packet: IMessagePacket): IAntiCheatMessage | null {
     try {
         const message = packet.message;
         const obj = JSON.parse(message);
@@ -101,7 +91,7 @@ function detectAntiCheatSource(text: string): AntiCheatSource {
     return text.includes("Scythe") ? AntiCheatSource.Scythe : AntiCheatSource.Paradox;
 }
 
-function sendMessage(message: AntiCheatMessage, channelId: TextBasedChannel): void {
+function sendMessage(message: IAntiCheatMessage, channelId: TextBasedChannel): void {
     if (config.useEmbed) {
         sendEmbedMessage(message, channelId);
     } else {
@@ -110,7 +100,7 @@ function sendMessage(message: AntiCheatMessage, channelId: TextBasedChannel): vo
     }
 }
 
-function sendEmbedMessage(message: AntiCheatMessage, channelId: TextBasedChannel): void {
+function sendEmbedMessage(message: IAntiCheatMessage, channelId: TextBasedChannel): void {
     const { correctedText } = message;
 
     if (correctedText.length >= 2000) {

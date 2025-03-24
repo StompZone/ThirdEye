@@ -1,36 +1,7 @@
 import { readFileSync } from "fs";
 import { join } from "path";
 import { CSZETranslations } from "./CSZETranslations.js";
-
-/**
- * Interface for correction mapping
- * Key is the pattern to replace, value is the replacement
- */
-interface CorrectionMap {
-    [key: string]: string;
-}
-
-/**
- * Interface for localization entry
- */
-interface LocalizationEntry {
-    text: string;
-    comment?: string;
-}
-
-/**
- * Interface for localization file
- */
-interface LocalizationFile {
-    [key: string]: LocalizationEntry;
-}
-
-/**
- * Interface for CSZE custom translations
- */
-interface CSZETranslations {
-    [key: string]: string;
-}
+import { ICorrectionMap, ILocalizationFile } from "../interface/interfaces.i.js";
 
 /**
  * Translates text from TTX encoding back to regular text
@@ -113,7 +84,7 @@ export function hasTTXEncoding(message: string): boolean {
  * Load standard Minecraft localizations from the en_US.json file
  * @returns Parsed localization data
  */
-function loadLocalizations(): LocalizationFile {
+function loadLocalizations(): ILocalizationFile {
     try {
         const filePath = join(process.cwd(), "src", "../en_US.json");
         const fileContent = readFileSync(filePath, "utf-8");
@@ -128,9 +99,9 @@ function loadLocalizations(): LocalizationFile {
  * Build correction map from localizations
  * @returns Correction map for text replacement
  */
-function buildCorrectionMap(): CorrectionMap {
+function buildCorrectionMap(): ICorrectionMap {
     // Start with the custom CSZE translations (higher priority)
-    const correctionMap: CorrectionMap = { ...CSZETranslations };
+    const correctionMap: ICorrectionMap = { ...CSZETranslations };
 
     // Load standard localizations
     const localizations = loadLocalizations();
@@ -168,7 +139,7 @@ function buildCorrectionMap(): CorrectionMap {
  * Map of text patterns to corrected versions
  * Built from the en_US.json and CSZETranslations
  */
-export const correction: CorrectionMap = buildCorrectionMap();
+export const correction: ICorrectionMap = buildCorrectionMap();
 
 /**
  * Format a parameterized message using standard Minecraft parameter format
