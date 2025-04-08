@@ -2,7 +2,8 @@ import { Client as BedrockClient, createClient } from "bedrock-protocol";
 import { TextBasedChannel } from "discord.js";
 import { ConfigTemplate } from "../core/config/types.js";
 import { handleDisconnection } from "./message_handler.js";
-import { processMinecraftMessage } from "./text_corrections.js";
+import { decodeTTX, processMinecraftMessage } from "./text_corrections.js";
+import { isTTXEncoded } from "../translation/translation.js";
 
 /**
  * Creates and configures a Minecraft client based on the provided configuration
@@ -125,6 +126,10 @@ export function setupClientEventHandlers(bot: BedrockClient, channelId: TextBase
 
         // Process the message with TTX decoding and text corrections
         messageContent = processMinecraftMessage(messageContent, params);
+
+        if (isTTXEncoded(messageContent)) {
+            messageContent = decodeTTX(messageContent);
+        }
 
         // Send message to Discord
         const discordMessage = `**${playerName}**: ${messageContent}`;
