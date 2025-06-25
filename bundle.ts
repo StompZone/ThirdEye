@@ -17,7 +17,7 @@ const archive = archiver("zip", { zlib: { level: 9 } });
 output.on("close", () => console.log(`Bundle created: ${outputZip} (${archive.pointer()} bytes)`));
 archive.on("error", (err) => { throw err; });
 
-archive.pipe(output);
+archive.pipe(output as unknown as NodeJS.WritableStream);
 archive.directory(".build/", false);
 archive.file("local.env.example", { name: "local.env.example" });
 archive.finalize();
