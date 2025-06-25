@@ -15,7 +15,9 @@ const output = createWriteStream(outputZip);
 const archive = archiver("zip", { zlib: { level: 9 } });
 
 output.on("close", () => console.log(`Bundle created: ${outputZip} (${archive.pointer()} bytes)`));
-archive.on("error", (err) => { throw err; });
+archive.on("error", (err) => {
+    throw err;
+});
 
 archive.pipe(output as unknown as NodeJS.WritableStream);
 archive.directory(".build/", false);
