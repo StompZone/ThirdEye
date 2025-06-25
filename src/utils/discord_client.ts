@@ -3,7 +3,7 @@ import { Client, GatewayIntentBits, TextBasedChannel } from "discord.js";
 import { ConfigTemplate } from "../core/config/types.js";
 import { IChannelConfig } from "../core/types/interfaces.js";
 import { registerCommands } from "../translation/registerCommands.js";
-import { checkAndDeleteEmptyChannels } from "../voiceChat_listener/voiceChatCleanUp.js";
+import { checkAndDeleteEmptyChannels } from "../voiceChat_listener/voiceChat.js";
 import { handleChatMessage, handleCommand } from "./message_handler.js";
 import { handleWhitelistCommand } from "./whitelist_manager.js";
 

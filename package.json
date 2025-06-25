@@ -31,7 +31,7 @@
     "install:dev": "npm i --include=dev",
     "prepare:dirs": "mkdir -p .build/bin",
     "copy:bin": "cp -r bin/* .build/bin/ || true",
-    "copy:src-assets": "find src -name '*.json' -o -name '*.bat' | xargs -I{} cp {} .build/ || true",
+    "copy:src-assets": "find src -name '*.json' -o -name '*.bat' -o -name '*.sh' | xargs -I{} cp {} .build/ || true",
     "copy:root-files": "cp package.json LICENSE README.md .build/ 2>/dev/null || true && cp prod.npmrc .build/.npmrc 2>/dev/null || true",
     "modify:package": "tsx modify-package.ts",
     "build": "npm run install:dev && npm run clean && tsc -p tsconfig.json && npm run prepare:dirs && npm run copy:bin && npm run copy:src-assets && npm run copy:root-files && npm run modify:package",
