@@ -2,6 +2,8 @@ import { Client } from "bedrock-protocol";
 import { Guild, TextBasedChannel } from "discord.js";
 import { logger } from "../../core/logging/logger.js";
 import { IMessagePacket, ITextPacket } from "../../core/types/interfaces.js";
+import { autoCorrect } from "../../utils/text_corrections.js";
+import { sendMessageToChannel } from "../../utils/message_handler.js";
 
 type PacketHandler<T> = (packet: T, ...args: any[]) => void | Promise<void>;
 
@@ -74,6 +76,26 @@ export class PacketListenerService {
      */
     private async handleTextPacket(packet: any, bot: Client, channel: TextBasedChannel, guild?: Guild): Promise<void> {
         try {
+            // Handle player join/leave messages
+            if (packet.type === "translation" && packet.message) {
+                // Handle player join
+                if (packet.message === "multiplayer.player.joined") {
+                    const playerName = packet.parameters?.[0];
+                    if (playerName) {
+                        const translatedMessage = autoCorrect(packet.message, [playerName]);
+                        await sendMessageToChannel(channel, translatedMessage);
+                    }
+                }
+                // Handle player leave
+                else if (packet.message === "multiplayer.player.left") {
+                    const playerName = packet.parameters?.[0];
+                    if (playerName) {
+                        const translatedMessage = autoCorrect(packet.message, [playerName]);
+                        await sendMessageToChannel(channel, translatedMessage);
+                    }
+                }
+            }
+
             // Process as text packet for general handlers
             for (const handler of this.textHandlers.values()) {
                 await Promise.resolve(handler(packet, bot, channel));

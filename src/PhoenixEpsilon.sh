@@ -53,11 +53,9 @@ banner=$(cat <<EOF
 EOF
 )
 
-clear
 echo -e "$banner"
 sleep 2
 echo
 echo -e "$phoenix"
 sleep 3
-clear
 node start.js

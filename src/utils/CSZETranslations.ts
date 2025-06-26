@@ -83,6 +83,8 @@ export const CSZETranslations = {
     "furnaceScreen.header": "Smelty McSmeltFace",
     "item.honey_bottle.name": "Bee Syrup",
     "item.milk.name": "Cow Juice",
+    "multiplayer.player.joined": "%s has joined the party!",
+    "multiplayer.player.left": "%s has left the party!",
     "progressScreen.dialog.button.enter": "Let me in!",
     "progressScreen.dialog.button.joinAndDownload": "Light it up - %1",
     "progressScreen.dialog.message.resourcePackOptional": "This world has Resource Packs applied to it. Would you like to send carrier pigeons to fetch them?",
