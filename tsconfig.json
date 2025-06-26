@@ -2,8 +2,7 @@
     "compileOnSave": false,
     "compilerOptions": {
         "typeRoots": [
-            "node_modules/@discordjs",
-            // "bedrock-protocol",
+            "node_modules/@types",
             "src/types"
         ],
         "lib": [
