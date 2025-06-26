@@ -4,6 +4,7 @@ import { logger } from "../../core/logging/logger.js";
 import { IMessagePacket, ITextPacket } from "../../core/types/interfaces.js";
 import { autoCorrect } from "../../utils/text_corrections.js";
 import { sendMessageToChannel } from "../../utils/message_handler.js";
+import { loadConfig } from "../../core/config/configLoader.js";
 
 type PacketHandler<T> = (packet: T, ...args: any[]) => void | Promise<void>;
 
@@ -12,6 +13,7 @@ export class PacketListenerService {
     private jsonWhisperHandlers: Map<string, PacketHandler<IMessagePacket>> = new Map();
     private chatHandlers: Map<string, PacketHandler<IMessagePacket>> = new Map();
     private playerHandlers: Map<string, PacketHandler<any>> = new Map();
+    private config = loadConfig();
 
     /**
      * Initialize all packet listeners for the Minecraft client
@@ -76,24 +78,38 @@ export class PacketListenerService {
      */
     private async handleTextPacket(packet: any, bot: Client, channel: TextBasedChannel, guild?: Guild): Promise<void> {
         try {
+            // Skip if the packet is from the bot itself
+            if (packet?.source_name === this.config.username) return;
+
+            const message = packet.message;
+
+            // Handle raw translation keys that need processing
+            if (message.startsWith("death.") || message.startsWith("multiplayer.")) {
+                const translatedMessage = autoCorrect(message, packet.parameters || []);
+                if (translatedMessage !== message) {
+                    await sendMessageToChannel(channel, translatedMessage);
+                    return;
+                }
+            }
+
             // Handle player join/leave messages
-            if (packet.type === "translation" && packet.message) {
-                // Handle player join
-                if (packet.message === "multiplayer.player.joined") {
-                    const playerName = packet.parameters?.[0];
-                    if (playerName) {
-                        const translatedMessage = autoCorrect(packet.message, [playerName]);
-                        await sendMessageToChannel(channel, translatedMessage);
-                    }
-                }
-                // Handle player leave
-                else if (packet.message === "multiplayer.player.left") {
-                    const playerName = packet.parameters?.[0];
-                    if (playerName) {
-                        const translatedMessage = autoCorrect(packet.message, [playerName]);
-                        await sendMessageToChannel(channel, translatedMessage);
-                    }
-                }
+            if (message.includes("§e.player.joined")) {
+                const playerName = message.split("§e.player.joined")[0].trim();
+                await sendMessageToChannel(channel, `${playerName} has joined the party!`);
+                return;
+            }
+            if (message.includes("§e.player.left")) {
+                const playerName = message.split("§e.player.left")[0].trim();
+                await sendMessageToChannel(channel, `${playerName} has left the party!`);
+                return;
+            }
+
+            // Handle formatted death messages (they already come pre-formatted)
+            if (message.includes("OOF!") && message.includes("died in")) {
+                // Remove color codes and send as is
+                const cleanMessage = message.replace(/§[0-9a-fklmnor]/g, "");
+                await sendMessageToChannel(channel, cleanMessage);
+                return;
             }
 
             // Process as text packet for general handlers
