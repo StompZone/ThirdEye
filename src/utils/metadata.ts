@@ -19,7 +19,7 @@ function getPackageJson() {
         logger.error(`Failed to read package.json: ${error.message}`);
         return {
             name: "Phoenix Epsilon",
-            version: "1.3.0",
+            version: "1.3.3-beta.2",
         };
     }
 }
