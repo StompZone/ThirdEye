@@ -6,6 +6,7 @@ import { VoiceChannelService } from "../../services/discord/VoiceChannelService.
 import { DeathMessageService } from "../../services/minecraft/DeathMessageService.js";
 import { MinecraftCommandService } from "../../services/minecraft/MinecraftCommandService.js";
 import { PacketListenerService } from "../../services/minecraft/PacketListenerService.js";
+import { PlayerConnectionService } from "../../services/minecraft/PlayerConnectionService.js";
 import { logger } from "../logging/logger.js";
 
 export class ServiceManager {
@@ -15,6 +16,7 @@ export class ServiceManager {
     private voiceChannelService: VoiceChannelService;
     private discordMemberService: DiscordMemberService;
     private minecraftCommandService: MinecraftCommandService;
+    private playerConnectionService: PlayerConnectionService;
 
     constructor() {
         this.antiCheatService = new AntiCheatService();
@@ -23,6 +25,7 @@ export class ServiceManager {
         this.voiceChannelService = new VoiceChannelService();
         this.discordMemberService = new DiscordMemberService();
         this.minecraftCommandService = new MinecraftCommandService();
+        this.playerConnectionService = new PlayerConnectionService();
     }
 
     initializeServices(bot: Client, channel: TextBasedChannel, guild?: Guild): void {
@@ -34,6 +37,7 @@ export class ServiceManager {
             // Register feature-specific handlers
             this.registerAntiCheatHandler(bot, channel);
             this.registerDeathMessageHandler(bot, channel);
+            this.registerPlayerConnectionHandler(bot, channel);
             if (guild) {
                 this.registerVoiceChatHandlers(bot, guild);
             }
@@ -53,6 +57,11 @@ export class ServiceManager {
     private registerDeathMessageHandler(bot: Client, channel: TextBasedChannel): void {
         this.packetListenerService.registerTextHandler("death", "death", (packet) => this.deathMessageService.processDeathMessage(packet, channel));
         logger.info("Death message handler registered");
+    }
+
+    private registerPlayerConnectionHandler(bot: Client, channel: TextBasedChannel): void {
+        bot.on("player_list", (packet) => this.playerConnectionService.handlePlayerConnection(packet, bot, channel));
+        logger.info("Player connection handler registered");
     }
 
     private registerVoiceChatHandlers(bot: Client, guild: Guild): void {
