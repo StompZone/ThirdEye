@@ -11,7 +11,7 @@ function getPackageJson() {
         const __dirname = dirname(__filename);
 
         // Read the package.json file - look at the project root
-        const packagePath = join(__dirname, "..", "..", "package.json");
+        const packagePath = join(__dirname, "..", "package.json");
         const packageJson = JSON.parse(readFileSync(packagePath, "utf-8"));
         return packageJson;
     } catch (error) {
