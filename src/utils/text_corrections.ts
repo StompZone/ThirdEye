@@ -91,10 +91,11 @@ function loadLocalizations(): ILocalizationFile {
         const fileContent = readFileSync(filePath, "utf-8");
         return JSON.parse(fileContent);
     } catch (error) {
-        console.error("Error loading standard localizations:", error);
+        logger.error(`Error loading standard localizations: ${error}`);
         return {};
     }
 }
+
 
 /**
  * Build correction map from localizations
@@ -103,14 +104,14 @@ function loadLocalizations(): ILocalizationFile {
 function buildCorrectionMap(): ICorrectionMap {
     // Start with the custom CSZE translations (higher priority)
     const correctionMap: ICorrectionMap = { ...CSZETranslations };
-
     // Load standard localizations
     const localizations = loadLocalizations();
 
     // Process all keys in the CSZE translations for pattern matching
     for (const [key, value] of Object.entries(CSZETranslations)) {
-        // Add pattern version with % wrapping
-        correctionMap[`%${key}%`] = value;
+        // Add both with and without % prefix
+        correctionMap[key] = value;
+        correctionMap[`%${key}`] = value;
     }
 
     // Process standard localizations (lower priority)
@@ -119,20 +120,16 @@ function buildCorrectionMap(): ICorrectionMap {
         if (correctionMap[key] !== undefined) {
             continue;
         }
-
         // Skip if we already have a pattern mapping for this key
-        if (correctionMap[`%${key}%`] !== undefined) {
+        if (correctionMap[`%${key}`] !== undefined) {
             continue;
         }
-
         // Use the text as the replacement
         const replacement = entry.text;
-
         // Add both direct key and pattern mappings
         correctionMap[key] = replacement;
-        correctionMap[`%${key}%`] = replacement;
+        correctionMap[`%${key}`] = replacement;
     }
-
     return correctionMap;
 }
 
@@ -174,30 +171,34 @@ function formatParameterizedMessage(template: string, params: string[]): string 
  * @returns The corrected message
  */
 export function autoCorrect(message: string, params: string[] = []): string {
-    if (!message) return message;
+    logger.info(`<text_corrections::autoCorrect> Message: ${message} Params: ${params}`);
+    if (!message)
+        return message;
 
-    let correctedMessage = message;
+    // Handle special Minecraft formatting codes (§) first
+    let correctedMessage = message.replace(/§[0-9a-fklmnor]/g, "").trim();
 
     // Direct key check first (exact match for message keys)
-    if (correction[message] !== undefined) {
-        const value = correction[message];
+    if (correction[correctedMessage] !== undefined) {
+        const value = correction[correctedMessage];
         return formatParameterizedMessage(value, params);
     }
 
     // Look for translatable patterns in the message
     for (const [key, value] of Object.entries(correction)) {
         // Skip keys that are unlikely to be in the middle of text (optimization)
-        if (!key.includes(".") && !key.startsWith("%")) continue;
+        if (!key.includes(".") && !key.startsWith("%"))
+            continue;
 
-        correctedMessage = correctedMessage.replace(
-            new RegExp(key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g"), // Escape special regex chars
-            (match) => formatParameterizedMessage(value, params)
-        );
+        const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // Escape special regex chars
+        const pattern = new RegExp(`^${escapedKey}$|^%${escapedKey}$`, "g");
+
+        if (pattern.test(correctedMessage)) {
+            return formatParameterizedMessage(value, params);
+        }
     }
 
-    // Handle special Minecraft formatting codes (§)
-    correctedMessage = correctedMessage.replace(/§[0-9a-fklmnor]/g, "");
-
+    logger.info(`<text_corrections::autoCorrect> Corrected Message: ${correctedMessage.trim()}`);
     return correctedMessage;
 }
 
@@ -209,25 +210,150 @@ export function autoCorrect(message: string, params: string[] = []): string {
  * @returns Processed message with TTX decoded and text corrected
  */
 export function processMinecraftMessage(message: string, params: string[] = []): string {
+    logger.info(`<text_corrections::processMinecraftMessage> Message: ${message} Params: ${params}`);
+    let processedMessage = message;
+    // Check if message contains TTX encoding and decode if necessary
+    if (hasTTXEncoding(processedMessage)) {
+        processedMessage = decodeTTX(processedMessage);
+    }
     try {
-        // Replace %s placeholders with actual values
-        let processedMessage = message;
-        params.forEach((param, index) => {
-            processedMessage = processedMessage.replace(`%${index + 1}`, param);
-        });
+        // First try to auto-correct using CSZETranslations
+        processedMessage = autoCorrect(processedMessage, params);
 
-        // Handle special cases
-        processedMessage = processedMessage
-            .replace(/%entity/g, "A tamed Animal")
-            .replace(/%d/g, "0")
-            .replace(/%s/g, "");
+        // If no translation was found, fallback to basic parameter replacement
+        if (processedMessage === decodeTTX(message)) {
+            params.forEach((param, index) => {
+                processedMessage = processedMessage.replace(`%${index + 1}`, param);
+            });
 
-        // Clean up any remaining placeholders
-        processedMessage = processedMessage.replace(/%[a-zA-Z0-9]+/g, "");
+            // Handle special cases
+            processedMessage = processedMessage
+                .replace(/%entity/g, "A tamed Animal")
+                .replace(/%d/g, "0")
+                .replace(/%s/g, "");
 
+            // Clean up any remaining placeholders
+            processedMessage = processedMessage.replace(/%[a-zA-Z0-9]+/g, "");
+        }
+
+
+
+        logger.info(`<text_corrections::processMinecraftMessage> Processed Message: ${processedMessage.trim()}`);
         return processedMessage.trim();
-    } catch (error) {
-        logger.error(`Error processing Minecraft message: ${error.message}`);
+    }
+    catch (error) {
+        logger.error(`<text_corrections::processMinecraftMessage> Error processing Minecraft message: ${error.message}`);
         return message; // Return original message if processing fails
     }
 }
+
+// ===============================================
+// LEGACY CODE - Reference use only - DO NOT REMOVE
+// ===============================================
+
+// /**
+//  * Build correction map from localizations
+//  * @returns Correction map for text replacement
+//  */
+// function legacyBuildCorrectionMap(): ICorrectionMap {
+//     // Start with the custom CSZE translations (higher priority)
+//     const correctionMap: ICorrectionMap = { ...CSZETranslations };
+
+//     // Load standard localizations
+//     const localizations = loadLocalizations();
+
+//     // Process all keys in the CSZE translations for pattern matching
+//     for (const [key, value] of Object.entries(CSZETranslations)) {
+//         // Add pattern version with % wrapping
+//         correctionMap[`%${key}%`] = value;
+//     }
+
+//     // Process standard localizations (lower priority)
+//     for (const [key, entry] of Object.entries(localizations)) {
+//         // Skip if we already have a custom mapping for this key
+//         if (correctionMap[key] !== undefined) {
+//             continue;
+//         }
+
+//         // Skip if we already have a pattern mapping for this key
+//         if (correctionMap[`%${key}%`] !== undefined) {
+//             continue;
+//         }
+
+//         // Use the text as the replacement
+//         const replacement = entry.text;
+
+//         // Add both direct key and pattern mappings
+//         correctionMap[key] = replacement;
+//         correctionMap[`%${key}%`] = replacement;
+//     }
+
+//     return correctionMap;
+// }
+
+// /**
+//  * Corrects text by applying defined replacement patterns
+//  *
+//  * @param message The message to correct
+//  * @param params Optional parameters for parameterized messages
+//  * @returns The corrected message
+//  */
+// export function legacyAutoCorrect(message: string, params: string[] = []): string {
+//     if (!message) return message;
+
+//     let correctedMessage = message;
+
+//     // Direct key check first (exact match for message keys)
+//     if (correction[message] !== undefined) {
+//         const value = correction[message];
+//         return formatParameterizedMessage(value, params);
+//     }
+
+//     // Look for translatable patterns in the message
+//     for (const [key, value] of Object.entries(correction)) {
+//         // Skip keys that are unlikely to be in the middle of text (optimization)
+//         if (!key.includes(".") && !key.startsWith("%")) continue;
+
+//         correctedMessage = correctedMessage.replace(
+//             new RegExp(key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g"), // Escape special regex chars
+//             (match) => formatParameterizedMessage(value, params)
+//         );
+//     }
+
+//     // Handle special Minecraft formatting codes (§)
+//     correctedMessage = correctedMessage.replace(/§[0-9a-fklmnor]/g, "");
+
+//     return correctedMessage;
+// }
+
+
+// /**
+//  * Comprehensive message processor that handles both TTX decoding and text corrections
+//  *
+//  * @param message The original message from Minecraft
+//  * @param params Optional parameters for parameterized messages
+//  * @returns Processed message with TTX decoded and text corrected
+//  */
+// export function legacyProcessMinecraftMessage(message: string, params: string[] = []): string {
+//     try {
+//         // Replace %s placeholders with actual values
+//         let processedMessage = message;
+//         params.forEach((param, index) => {
+//             processedMessage = processedMessage.replace(`%${index + 1}`, param);
+//         });
+
+//         // Handle special cases
+//         processedMessage = processedMessage
+//             .replace(/%entity/g, "A tamed Animal")
+//             .replace(/%d/g, "0")
+//             .replace(/%s/g, "");
+
+//         // Clean up any remaining placeholders
+//         processedMessage = processedMessage.replace(/%[a-zA-Z0-9]+/g, "");
+
+//         return processedMessage.trim();
+//     } catch (error) {
+//         logger.error(`Error processing Minecraft message: ${error.message}`);
+//         return message; // Return original message if processing fails
+//     }
+// }
