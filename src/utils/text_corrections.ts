@@ -96,7 +96,6 @@ function loadLocalizations(): ILocalizationFile {
     }
 }
 
-
 /**
  * Build correction map from localizations
  * @returns Correction map for text replacement
@@ -172,8 +171,7 @@ function formatParameterizedMessage(template: string, params: string[]): string 
  */
 export function autoCorrect(message: string, params: string[] = []): string {
     logger.info(`<text_corrections::autoCorrect> Message: ${message} Params: ${params}`);
-    if (!message)
-        return message;
+    if (!message) return message;
 
     // Handle special Minecraft formatting codes (§) first
     let correctedMessage = message.replace(/§[0-9a-fklmnor]/g, "").trim();
@@ -187,8 +185,7 @@ export function autoCorrect(message: string, params: string[] = []): string {
     // Look for translatable patterns in the message
     for (const [key, value] of Object.entries(correction)) {
         // Skip keys that are unlikely to be in the middle of text (optimization)
-        if (!key.includes(".") && !key.startsWith("%"))
-            continue;
+        if (!key.includes(".") && !key.startsWith("%")) continue;
 
         const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // Escape special regex chars
         const pattern = new RegExp(`^${escapedKey}$|^%${escapedKey}$`, "g");
@@ -236,12 +233,9 @@ export function processMinecraftMessage(message: string, params: string[] = []):
             processedMessage = processedMessage.replace(/%[a-zA-Z0-9]+/g, "");
         }
 
-
-
         logger.info(`<text_corrections::processMinecraftMessage> Processed Message: ${processedMessage.trim()}`);
         return processedMessage.trim();
-    }
-    catch (error) {
+    } catch (error) {
         logger.error(`<text_corrections::processMinecraftMessage> Error processing Minecraft message: ${error.message}`);
         return message; // Return original message if processing fails
     }
@@ -325,7 +319,6 @@ export function processMinecraftMessage(message: string, params: string[] = []):
 
 //     return correctedMessage;
 // }
-
 
 // /**
 //  * Comprehensive message processor that handles both TTX decoding and text corrections
